@@ -1,4 +1,10 @@
 export interface IActor {
+    username?: string;
+
+    password?: string;
+
+    name: string;
+
     // connection to questions
     asks<T>(question: IQuestion<T>, activityResult: T): Promise<T>;
 
@@ -18,7 +24,7 @@ export interface IAbility {
 }
 
 /**
- * An object representing an action that an {@link Actor} can perform.
+ * An object representing an action that an {@link IActor} can perform.
  */
 export interface IAction {
     /**

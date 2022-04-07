@@ -2,9 +2,7 @@
     "parser": "@typescript-eslint/parser",
     "ignorePatterns": [
         "node_modules/",
-        "build/",
-        "coverage/",
-        "doc/"
+        "lib/"
     ],
     "extends": [
         "airbnb",
@@ -20,32 +18,18 @@
     "parserOptions": {
         "ecmaVersion": 2018,
         "sourceType": "module",
-        "ecmaFeatures": {
-            "jsx": true
-        },
         "editor.codeActionsOnSave": {
             "source.fixAll": true
         }
     },
     "rules": {
         "react/react-in-jsx-scope": "off",
-        "react/jsx-filename-extension": [
-            "error",
-            {
-                "extensions": [
-                    ".jsx",
-                    ".tsx"
-                ]
-            }
-        ],
         "import/extensions": [
             "error",
             {
                 "extensions": [
                     ".js",
-                    ".jsx",
-                    ".ts",
-                    ".tsx"
+                    ".ts"
                 ]
             }
         ],

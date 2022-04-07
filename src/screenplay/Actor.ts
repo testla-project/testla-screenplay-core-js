@@ -6,11 +6,11 @@ import {
  * Actors use abilities in order to execute tasks/actions and answer questions.
  */
 export class Actor implements IActor {
-    private username?: string;
+    public username?: string;
 
-    private password?: string;
+    public password?: string;
 
-    private name: string;
+    public name: string;
 
     // map of abilities of this Actor
     private abilityMap: Map<string, IAbility> = new Map();
