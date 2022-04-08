@@ -16,7 +16,10 @@
     "preversion" : "npm run lint"
 
   },
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*",
+    "doc/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/testla-project/testla-screenplay-core-js.git"

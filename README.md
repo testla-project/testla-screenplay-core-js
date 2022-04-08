@@ -15,16 +15,7 @@ The Screenplay Pattern is beautiful in its simplicity. It's made up of five elem
 
 The key elements of the pattern are: actors, abilities, tasks, actions and questions.
 
-```mermaid
-graph TB;
-    Actor-->|has|Abilities;
-    Actor-->|performs|Tasks;
-    Actor-->|asks|Questions;
-    Tasks-->|utilizes|Actions;
-    Abilities-->|enable|Actions;
-    Actions-->|with|a[System under Test];
-    Questions-->|about the state of|a[System under Test];
-```
+![Screenplay Pattern](/doc/screenplay.png)
 
 ## How to use this package?
 
