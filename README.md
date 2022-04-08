@@ -69,7 +69,7 @@ class MyBrowseAbility extends Ability {
     }
 
     // find functionality by using playwright spicific code for our example
-    public async find(locator: string): Promise<void> {
+    public async find(locator: string): Promise<any> {
         return this.page.waitForSelector(locator);
     }
 
@@ -86,6 +86,9 @@ The next step is to define actions and which can be grouped into tasks later. Ac
 import { Action } from '@testla/screenplay';
 
 class Navigate extends Action {
+    // typescript requires class variable definitions
+    private readonly url: string;
+
     private constructor(url: string) {
         super();
         this.url = url;
@@ -103,6 +106,10 @@ class Navigate extends Action {
 }
 
 class Fill extends Action {
+    // typescript requires class variable definitions
+    private readonly locator: string;
+    private readonly value: string;
+
     private constructor(locator: string, value: string) {
         super();
         this.locator = locator;
@@ -121,6 +128,9 @@ class Fill extends Action {
 }
 
 class Click extends Action {
+    // typescript requires class variable definitions
+    private readonly locator: string;
+
     private constructor(locator: string) {
         super();
         this.locator = locator;
@@ -138,6 +148,9 @@ class Click extends Action {
 }
 
 class Find extends Action {
+    // typescript requires class variable definitions
+    private readonly locator: string;
+
     private constructor(locator: string) {
         super();
         this.locator = locator;
@@ -209,14 +222,36 @@ import { Actor } from "@testla/screenplay";
 
 // Example test case with Playwright
 test.describe('My Test', () => {
-    test('My first test', async ({ page}) => {
+    test('My first test', async ({ page }) => {
         const actor = Actor.named('James').withCredentials('username', 'password');
         actor.can(MyBrowseAbility.using(page));
 
         await actor.attemptsTo(Login.toApp());
 
-        const result = await actor.asks(LoginStatus.of());
-        expect(result).not.toBeNull();
+        expect(await actor.asks(LoginStatus.of())).not.toBeNull();
     });
 });
+```
+
+### What about the 'Screen' in 'Screenplay'?
+
+With screen is meant that all locators for page elements are held in specific files/collections. In our example from above we put the locators inline. A sample screen file for the Login task could look like this:
+
+```js
+const USERNAME_INPUT = '#username';
+const PASSWORD_INPUT = '#password';
+const LOGIN_BUTTON = '#login-button';
+```
+
+Within the task the screen elements are then used as:
+
+```js
+public async performAs(actor: Actor): Promise<any> {
+    return actor.attemptsTo(
+        Navigate.to('https://www.my-fancy-url.com'),
+        Fill.with(USERNAME_INPUT, actor.username || ''),
+        Fill.with(PASSWORD_INPUT, actor.password || ''),
+        Click.on(LOGIN_BUTTON),
+    );
+}
 ```
