@@ -3,11 +3,8 @@
     "rootDir": "./src",
     "target": "es6",
     "lib": [
-      "dom",
-      "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -19,7 +16,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "jsx": "react-jsx",
     "outDir": "./lib",
     "declaration": true,
   },
