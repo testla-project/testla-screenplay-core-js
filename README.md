@@ -192,5 +192,31 @@ class LoginStatus extends Question<any> {
     public async answeredBy(actor: Actor): Promise<any> {
         return BrowseTheWeb.as(actor).find('#logged-in-indicator');
     }
+
+    // static member method to invoke the question
+    public static of() {
+        return new LoginStatus();
+    }
 }
+```
+
+### Define a test case
+
+The final step is to define a test case using the Actions and Abilities defined above.
+
+```js
+import { Actor } from "@testla/screenplay";
+
+// Example test case with Playwright
+test.describe('My Test', () => {
+    test('My first test', async ({ page}) => {
+        const actor = Actor.named('James').withCredentials('username', 'password');
+        actor.can(MyBrowseAbility.using(page));
+
+        await actor.attemptsTo(Login.toApp());
+
+        const result = await actor.asks(LoginStatus.of());
+        expect(result).not.toBeNull();
+    });
+});
 ```
