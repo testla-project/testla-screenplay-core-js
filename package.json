@@ -1,7 +1,7 @@
 {
   "name": "@testla/screenplay",
   "version": "0.1.0",
-  "description": "",
+  "description": "Framework for an implementation of the Screenplay pattern.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "commitHooks": false,
@@ -23,7 +23,12 @@
   },
   "keywords": [
     "screenplay",
-    "testla"
+    "testla",
+    "testing",
+    "test",
+    "tdd",
+    "bdd",
+    "e2e"
   ],
   "author": "",
   "license": "MIT",
@@ -40,7 +45,7 @@
     "typescript": "^4.6.3"
   },
   "engines": {
-    "node": ">=16.x.x"
+    "node": ">=12.x.x"
   },
   "publishConfig": {
     "access": "public"
