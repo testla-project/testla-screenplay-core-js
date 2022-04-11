@@ -1,16 +1,19 @@
 export interface IActor {
-    username?: string;
+    // collection of attributes assigned to the actor
+    attributes: { [key: string]: any };
 
-    password?: string;
+    // set attribute
+    with(key: string, value: any): IActor;
 
-    name: string;
+    // get attribute
+    tells(key: string): any;
 
     // connection to questions
     asks<T>(question: IQuestion<T>, activityResult: T): Promise<T>;
 
     // connection to abilities
     withAbilityTo(ability: IAbility): IAbility;
-    can(ability: IAbility): void;
+    can(ability: IAbility): IActor;
 
     // connection to tasks/actions
     attemptsTo(...activities: (ITask | IAction)[]): Promise<any>;

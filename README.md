@@ -1,4 +1,4 @@
-# Testla Screenplay Core
+# Testla Screenplay
 
 ## Introduction
 
@@ -214,8 +214,10 @@ import { Actor } from "@testla/screenplay";
 // Example test case with Playwright
 test.describe('My Test', () => {
     test('My first test', async ({ page }) => {
-        const actor = Actor.named('James').withCredentials('username', 'password');
-        actor.can(MyBrowseAbility.using(page));
+        const actor = Actor.named('James')
+            .with('username', 'John Doe')
+            .with('password', 'MySecretPassword');
+            .can(MyBrowseAbility.using(page));
 
         await actor.attemptsTo(Login.toApp());
 
@@ -240,8 +242,8 @@ Within the task the screen elements are then used as:
 public async performAs(actor: Actor): Promise<any> {
     return actor.attemptsTo(
         Navigate.to('https://www.my-fancy-url.com'),
-        Fill.with(USERNAME_INPUT, actor.username || ''),
-        Fill.with(PASSWORD_INPUT, actor.password || ''),
+        Fill.with(USERNAME_INPUT, actor.tells('username') || ''),
+        Fill.with(PASSWORD_INPUT, actor.tells('passwird') || ''),
         Click.on(LOGIN_BUTTON),
     );
 }

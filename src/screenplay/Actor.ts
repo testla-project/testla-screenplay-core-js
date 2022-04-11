@@ -6,17 +6,25 @@ import {
  * Actors use abilities in order to execute tasks/actions and answer questions.
  */
 export class Actor implements IActor {
-    public username?: string;
+    // collection of attributes assigned to the actor
+    attributes: { [key: string]: any } = {};
 
-    public password?: string;
+    // set attribute
+    public with(key: string, value: any): IActor {
+        this.attributes = { ...this.attributes, [key]: value };
+        return this;
+    }
 
-    public name: string;
+    // get attribute
+    public tells(key: string): any {
+        return this.attributes[key];
+    }
 
     // map of abilities of this Actor
     private abilityMap: Map<string, IAbility> = new Map();
 
     /** create a new Actor with a given name. */
-    public static named(name: string): Actor {
+    public static named(name: string): IActor {
         return new Actor(name);
     }
 
@@ -26,16 +34,17 @@ export class Actor implements IActor {
      * @param username
      * @param password
      * @returns the actor object
+     *
+     * @deprecated This method is deprecated and will be removed in the future. Use
      */
     public withCredentials(username: string, password: string): Actor {
-        this.username = username;
-        this.password = password;
-
+        this.attributes.username = username;
+        this.attributes.password = password;
         return this;
     }
 
     private constructor(name: string) {
-        this.name = name;
+        this.attributes = { name };
     }
 
     /**
