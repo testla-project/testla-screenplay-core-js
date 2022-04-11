@@ -6,7 +6,7 @@ export interface IActor {
     with(key: string, value: any): IActor;
 
     // get attribute
-    tells(key: string): any;
+    states(key: string): any;
 
     // connection to questions
     asks<T>(question: IQuestion<T>, activityResult: T): Promise<T>;

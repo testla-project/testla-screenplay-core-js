@@ -9,22 +9,31 @@ export class Actor implements IActor {
     // collection of attributes assigned to the actor
     attributes: { [key: string]: any } = {};
 
-    // set attribute
-    public with(key: string, value: any): IActor {
+    /**
+     * Store an attribute in the actors attribute collection.
+     * @param key attribute name
+     * @param value attribute value
+     * @returns {Actor}
+     */
+    public with(key: string, value: any): Actor {
         this.attributes = { ...this.attributes, [key]: value };
         return this;
     }
 
-    // get attribute
-    public tells(key: string): any {
+    /**
+     * Get an attribute from the actors attribute collection.
+     * @param key Key for the attribute
+     * @returns Value for the requested attribute
+     */
+    public states(key: string): any {
         return this.attributes[key];
     }
 
     // map of abilities of this Actor
     private abilityMap: Map<string, IAbility> = new Map();
 
-    /** create a new Actor with a given name. */
-    public static named(name: string): IActor {
+    /** Create a new Actor with a given name. */
+    public static named(name: string): Actor {
         return new Actor(name);
     }
 
@@ -52,7 +61,7 @@ export class Actor implements IActor {
      *
      * @param abilities the abilities the actor will be able to use.
      */
-    public can(...abilities: IAbility[]) : IActor {
+    public can(...abilities: IAbility[]) : Actor {
         abilities.forEach((ability) => this.abilityMap.set(ability.name, ability));
         return this;
     }

@@ -242,8 +242,8 @@ Within the task the screen elements are then used as:
 public async performAs(actor: Actor): Promise<any> {
     return actor.attemptsTo(
         Navigate.to('https://www.my-fancy-url.com'),
-        Fill.with(USERNAME_INPUT, actor.tells('username') || ''),
-        Fill.with(PASSWORD_INPUT, actor.tells('passwird') || ''),
+        Fill.with(USERNAME_INPUT, actor.states('username') || ''),
+        Fill.with(PASSWORD_INPUT, actor.states('passwird') || ''),
         Click.on(LOGIN_BUTTON),
     );
 }
