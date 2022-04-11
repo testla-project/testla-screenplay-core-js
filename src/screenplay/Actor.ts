@@ -6,16 +6,33 @@ import {
  * Actors use abilities in order to execute tasks/actions and answer questions.
  */
 export class Actor implements IActor {
-    public username?: string;
+    // collection of attributes assigned to the actor
+    attributes: { [key: string]: any } = {};
 
-    public password?: string;
+    /**
+     * Store an attribute in the actors attribute collection.
+     * @param key attribute name
+     * @param value attribute value
+     * @returns {Actor}
+     */
+    public with(key: string, value: any): Actor {
+        this.attributes = { ...this.attributes, [key]: value };
+        return this;
+    }
 
-    public name: string;
+    /**
+     * Get an attribute from the actors attribute collection.
+     * @param key Key for the attribute
+     * @returns Value for the requested attribute
+     */
+    public states(key: string): any {
+        return this.attributes[key];
+    }
 
     // map of abilities of this Actor
     private abilityMap: Map<string, IAbility> = new Map();
 
-    /** create a new Actor with a given name. */
+    /** Create a new Actor with a given name. */
     public static named(name: string): Actor {
         return new Actor(name);
     }
@@ -26,16 +43,17 @@ export class Actor implements IActor {
      * @param username
      * @param password
      * @returns the actor object
+     *
+     * @deprecated This method is deprecated and will be removed in the future. Use
      */
     public withCredentials(username: string, password: string): Actor {
-        this.username = username;
-        this.password = password;
-
+        this.attributes.username = username;
+        this.attributes.password = password;
         return this;
     }
 
     private constructor(name: string) {
-        this.name = name;
+        this.attributes = { name };
     }
 
     /**
@@ -43,7 +61,7 @@ export class Actor implements IActor {
      *
      * @param abilities the abilities the actor will be able to use.
      */
-    public can(...abilities: IAbility[]) : IActor {
+    public can(...abilities: IAbility[]) : Actor {
         abilities.forEach((ability) => this.abilityMap.set(ability.name, ability));
         return this;
     }
