@@ -71,10 +71,14 @@ export class Actor implements IActor {
      *
      * @param activities a list of tasks to execute.
      */
-    public attemptsTo(...activities: (ITask | IAction)[]): Promise<any> {
+    public async attemptsTo(...activities: (ITask | IAction)[]): Promise<any> {
         // execute each activity in order.
-        const reducefn = (chain: Promise<any>, activity: ITask | IAction): Promise<any> => chain.then((): Promise<any> => activity.performAs(this));
-        return activities.reduce(reducefn, Promise.resolve());
+        const reducefn = async (chain: Promise<any>, activity: ITask | IAction): Promise<any> => chain.then(async (): Promise<any> => {
+            const innerRes = await activity.performAs(this);
+            return Promise.resolve(innerRes);
+        });
+        const attempsRes = await activities.reduce(reducefn, Promise.resolve());
+        Promise.resolve(attempsRes);
     }
 
     /**
@@ -94,7 +98,7 @@ export class Actor implements IActor {
      *
      * @param question the question to ask.
      */
-    public asks<T>(question: IQuestion<T>): Promise<T> {
+    public async asks<T>(question: IQuestion<T>): Promise<T> {
         return question.answeredBy(this);
     }
 }
