@@ -1,0 +1,11 @@
+{
+    "transform": {
+        "\\.ts$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+        "/node_modules/"
+    ],
+    "testMatch": [
+        "**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)"
+    ]
+}
