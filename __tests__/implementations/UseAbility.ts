@@ -14,6 +14,6 @@ export class UseAbility extends Ability {
     }
 
     public async retrievePayload() {
-        return this.payload;
+        return Promise.resolve(this.payload);
     }
 }
