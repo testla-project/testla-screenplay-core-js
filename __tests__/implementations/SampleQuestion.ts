@@ -9,7 +9,7 @@ export class SampleQuestion extends Question<boolean> {
     }
 
     public async answeredBy(actor: Actor): Promise<boolean> {
-        const payload = await UseAbility.as(actor).retrievePayload();
+        const payload = await UseAbility.as(actor).getPayload();
         expect(this.val === payload).toBe(this.checkMode === 'toHave');
         return true;
     }

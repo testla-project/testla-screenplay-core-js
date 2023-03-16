@@ -16,9 +16,19 @@ describe('Testing the core', () => {
         const TestActor = Actor.named('Test Actor')
             .can(UseAbility.using('test'));
         const retrievedValue = await TestActor.attemptsTo(
-            UtilizeAction.ability(),
+            UtilizeAction.getAbilityPayload(),
         );
         expect(retrievedValue).toBe('test');
+    });
+
+    test('Trigger multiple actions at one shot', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test'));
+        const retrievedValue = await TestActor.attemptsTo(
+            UtilizeAction.setAbilityPayload('another test'),
+            UtilizeAction.getAbilityPayload(),
+        );
+        expect(retrievedValue).toBe('another test');
     });
 
     test('Register an ability with an actor and use it via task that wrappes action', async () => {

@@ -13,7 +13,12 @@ export class UseAbility extends Ability {
         return actor.withAbilityTo(this) as UseAbility;
     }
 
-    public async retrievePayload() {
+    public async getPayload() {
         return Promise.resolve(this.payload);
+    }
+
+    public async setPayload(payload: any) {
+        this.payload = payload;
+        return Promise.resolve();
     }
 }

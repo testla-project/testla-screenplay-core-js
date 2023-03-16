@@ -5,7 +5,7 @@ export class WrapperTask extends Task {
     // eslint-disable-next-line class-methods-use-this
     public async performAs(actor: Actor): Promise<any> {
         return actor.attemptsTo(
-            UtilizeAction.ability(),
+            UtilizeAction.getAbilityPayload(),
         );
     }
 
