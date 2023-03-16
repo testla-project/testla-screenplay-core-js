@@ -8,7 +8,7 @@ export class UtilizeAction extends Action {
 
     // eslint-disable-next-line class-methods-use-this
     public async performAs(actor: Actor): Promise<any> {
-        const ability = UseAbility.as(actor);
+        const ability = UseAbility.as(actor, this.abilityAlias);
         if (this.mode === 'set') {
             return ability.setPayload(this.payload);
         }

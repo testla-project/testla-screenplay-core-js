@@ -1,9 +1,10 @@
 import { IAction, IActor } from '../interfaces';
+import { UsingAlias } from '../templates/UsingAlias';
 
 /**
  * Actions can be triggered by calling them from an actor object.
  */
-export abstract class Action implements IAction {
+export abstract class Action extends UsingAlias implements IAction {
     /**
      *  Makes the provided {@link IActor}
      *  perform this Action.

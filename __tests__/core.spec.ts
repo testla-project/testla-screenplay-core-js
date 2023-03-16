@@ -70,4 +70,55 @@ describe('Testing the core', () => {
         }
         expect(hasError).toBe(true);
     });
+
+    // --- new alias functionality
+
+    test('Register an ability (with alias) with an actor and use it via action', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test').withAlias('test alias'));
+        const retrievedValue = await TestActor.attemptsTo(
+            UtilizeAction.getAbilityPayload().withAbilityAlias('test alias'),
+        );
+        expect(retrievedValue).toBe('test');
+    });
+
+    test('Register 2 abilities (1 with alias) with an actor and use them via action', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test'))
+            .can(UseAbility.using('test with alias').withAlias('test alias'));
+
+        const retrievedValue = await TestActor.attemptsTo(
+            UtilizeAction.getAbilityPayload(),
+        );
+        expect(retrievedValue).toBe('test');
+
+        const retrievedValueWithAlias = await TestActor.attemptsTo(
+            UtilizeAction.getAbilityPayload().withAbilityAlias('test alias'),
+        );
+        expect(retrievedValueWithAlias).toBe('test with alias');
+    });
+
+    // test('Register an ability (with alias) with an actor and use it via task', async () => {
+    //     const TestActor = Actor.named('Test Actor')
+    //         .can(UseAbility.using('test').withAlias('test alias'));
+    //     const retrievedValue = await TestActor.attemptsTo(
+    //         WrapperTask.execute().withAbilityAlias('test alias'),
+    //     );
+    //     expect(retrievedValue).toBe('test');
+    // });
+
+    test('Register an ability (with alias) with an actor and use it with a question', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test').withAlias('test alias'));
+        await TestActor.asks(SampleQuestion.toHave.payload('test').withAbilityAlias('test alias'));
+    });
+
+    test('Register 2 abilities (1 with alias) with an actor and use them with questions', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test'))
+            .can(UseAbility.using('test with alias').withAlias('test alias'));
+
+        await TestActor.asks(SampleQuestion.toHave.payload('test'));
+        await TestActor.asks(SampleQuestion.toHave.payload('test with alias').withAbilityAlias('test alias'));
+    });
 });

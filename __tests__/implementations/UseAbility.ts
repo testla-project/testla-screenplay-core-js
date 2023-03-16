@@ -9,8 +9,8 @@ export class UseAbility extends Ability {
         return new UseAbility(payload);
     }
 
-    public static as(actor: Actor): UseAbility {
-        return actor.withAbilityTo(this) as UseAbility;
+    public static as(actor: Actor, alias?: any): UseAbility {
+        return actor.withAbilityTo(this, alias) as UseAbility;
     }
 
     public async getPayload() {

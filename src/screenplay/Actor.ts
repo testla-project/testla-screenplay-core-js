@@ -62,7 +62,13 @@ export class Actor implements IActor {
      * @param abilities the abilities the actor will be able to use.
      */
     public can(...abilities: IAbility[]) : Actor {
-        abilities.forEach((ability) => this.abilityMap.set(ability.name, ability));
+        abilities.forEach((ability) => {
+            const abilityIdentifier = `${ability.name}${ability.alias ? `-${ability.alias}` : ''}`;
+            if (this.abilityMap.get(abilityIdentifier) !== undefined) {
+                throw (new Error('Error: Ability with this identifier already defined'));
+            }
+            this.abilityMap.set(abilityIdentifier, ability);
+        });
         return this;
     }
 
@@ -78,7 +84,7 @@ export class Actor implements IActor {
             return Promise.resolve(innerRes);
         });
         const attempsRes = await activities.reduce(reducefn, Promise.resolve());
-        Promise.resolve(attempsRes);
+        return Promise.resolve(attempsRes);
     }
 
     /**
@@ -86,11 +92,12 @@ export class Actor implements IActor {
      *
      * @param ability the ability.
      */
-    public withAbilityTo(ability: IAbility): IAbility {
-        if (!this.abilityMap.has(ability.name)) {
-            throw new Error('Error: This Actor does not have this ability!');
+    public withAbilityTo(ability: IAbility, alias?: string): IAbility {
+        const abilityIdentifier = `${ability.name}${alias ? `-${alias}` : ''}`;
+        if (!this.abilityMap.has(abilityIdentifier)) {
+            throw new Error(`Error: This Actor does not have the required ability '${ability.name}'${alias ? `(with alias '${alias}')` : ''}!`);
         }
-        return this.abilityMap.get(ability.name) as IAbility;
+        return this.abilityMap.get(abilityIdentifier) as IAbility;
     }
 
     /**
