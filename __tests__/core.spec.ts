@@ -31,6 +31,19 @@ describe('Testing the core', () => {
         expect(retrievedValue).toBe('another test');
     });
 
+    test('Try using an action without actor having the corresponding ability assigned', async () => {
+        let hasError = false;
+        const TestActor = Actor.named('Test Actor');
+        try {
+            await TestActor.attemptsTo(
+                UtilizeAction.getAbilityPayload(),
+            );
+        } catch (e) {
+            hasError = true;
+        }
+        expect(hasError).toBe(true);
+    });
+
     test('Register an ability with an actor and use it via task that wrappes action', async () => {
         const TestActor = Actor.named('Test Actor')
             .can(UseAbility.using('test'));
@@ -45,5 +58,16 @@ describe('Testing the core', () => {
             .can(UseAbility.using('test'));
         await TestActor.asks(SampleQuestion.toHave.payload('test'));
         await TestActor.asks(SampleQuestion.notToHave.payload('test1'));
+    });
+
+    test('Try using a question without actor having the corresponding ability assigned', async () => {
+        let hasError = false;
+        const TestActor = Actor.named('Test Actor');
+        try {
+            await TestActor.asks(SampleQuestion.toHave.payload('test'));
+        } catch (e) {
+            hasError = true;
+        }
+        expect(hasError).toBe(true);
     });
 });
