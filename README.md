@@ -26,7 +26,7 @@ Abilities are essential since they define _what_ an actor _can do_. So the first
 ```js
 import { Ability } from '@testla/screenplay';
 
-class MyBrowseAbility extends Ability {
+export class MyBrowseAbility extends Ability {
     private constructor(page: Page) {
         super();
         this.page = page;
@@ -76,7 +76,7 @@ The next step is to define actions and which can be grouped into tasks later. Ac
 ```js
 import { Action } from '@testla/screenplay';
 
-class Navigate extends Action {
+export class Navigate extends Action {
     // typescript requires class variable definitions
     private readonly url: string;
 
@@ -96,7 +96,7 @@ class Navigate extends Action {
     }
 }
 
-class Fill extends Action {
+export class Fill extends Action {
     // typescript requires class variable definitions
     private readonly locator: string;
     private readonly value: string;
@@ -118,7 +118,7 @@ class Fill extends Action {
     }
 }
 
-class Click extends Action {
+export class Click extends Action {
     // typescript requires class variable definitions
     private readonly locator: string;
 
@@ -138,7 +138,7 @@ class Click extends Action {
     }
 }
 
-class Find extends Action {
+export class Find extends Action {
     // typescript requires class variable definitions
     private readonly locator: string;
 
@@ -166,7 +166,7 @@ Tasks group actions into logical entities.
 ```js
 import { Task } from '@testla/screenplay';
 
-class Login extends Task {
+export class Login extends Task {
     // the actual implementation of the task
     public async performAs(actor: Actor): Promise<any> {
         return actor.attemptsTo(
@@ -191,7 +191,7 @@ Questions are used to check the status of the application under test.
 ```js
 import { Question } from '@testla/screenplay';
 
-class LoginStatus extends Question<any> {
+export class LoginStatus extends Question<any> {
     private constructor(private checkMode: 'toBe' | 'notToBe') {
         super();
     }
@@ -247,23 +247,29 @@ test.describe('My Test', () => {
 
 ### What about the 'Screen' in 'Screenplay'?
 
-With screen is meant that all locators for page elements are held in specific files/collections. In our example from above we put the locators inline. A sample screen file for the Login task could look like this:
+With screen is meant that all locators for page elements are held in specific files/classes. In our example from above we put the locators inline. A sample screen class for the Login task could look like this:
 
 ```js
-const USERNAME_INPUT = '#username';
-const PASSWORD_INPUT = '#password';
-const LOGIN_BUTTON = '#login-button';
+export class MyScreen {
+    static USERNAME_INPUT = '#username';
+    static PASSWORD_INPUT = '#password';
+    static LOGIN_BUTTON = '#login-button';
+}
 ```
 
 Within the task the screen elements are then used as:
 
 ```js
+import { MyScreen as SCREEN } from '../../screenplay/ui/screen/Home';
+
+// ...
+
 public async performAs(actor: Actor): Promise<any> {
     return actor.attemptsTo(
         Navigate.to('https://www.my-fancy-url.com'),
         Fill.with(USERNAME_INPUT, actor.states('username') || ''),
         Fill.with(PASSWORD_INPUT, actor.states('passwird') || ''),
-        Click.on(LOGIN_BUTTON),
+        Click.on(SCREEN.LOGIN_BUTTON),
     );
 }
 ```
