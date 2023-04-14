@@ -8,7 +8,7 @@ export class UsingAlias {
      * @param alias with which an ability was initialized
      * @returns current action
      */
-    public withAbilityAlias(alias: string) {
+    public withAbilityAlias(alias: string | undefined) {
         this.abilityAlias = alias;
         return this;
     }

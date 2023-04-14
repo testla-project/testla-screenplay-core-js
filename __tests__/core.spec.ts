@@ -98,14 +98,14 @@ describe('Testing the core', () => {
         expect(retrievedValueWithAlias).toBe('test with alias');
     });
 
-    // test('Register an ability (with alias) with an actor and use it via task', async () => {
-    //     const TestActor = Actor.named('Test Actor')
-    //         .can(UseAbility.using('test').withAlias('test alias'));
-    //     const retrievedValue = await TestActor.attemptsTo(
-    //         WrapperTask.execute().withAbilityAlias('test alias'),
-    //     );
-    //     expect(retrievedValue).toBe('test');
-    // });
+    test('Register an ability (with alias) with an actor and use it via task', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test').withAlias('test alias'));
+        const retrievedValue = await TestActor.attemptsTo(
+            WrapperTask.execute().withAbilityAlias('test alias'),
+        );
+        expect(retrievedValue).toBe('test');
+    });
 
     test('Register an ability (with alias) with an actor and use it with a question', async () => {
         const TestActor = Actor.named('Test Actor')
