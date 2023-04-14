@@ -192,14 +192,33 @@ Questions are used to check the status of the application under test.
 import { Question } from '@testla/screenplay';
 
 class LoginStatus extends Question<any> {
-    // the actual implementation of the task
+    private constructor(private checkMode: 'toBe' | 'notToBe') {
+        super();
+    }
+    
+    // the actual implementation of the question
     public async answeredBy(actor: Actor): Promise<any> {
-        return BrowseTheWeb.as(actor).find('#logged-in-indicator');
+        let success = false;
+
+        try {
+            await MyBrowseAbility.as(actor).find('#logged-in-indicator');
+            success = true;
+        }
+
+        expect(success).toBe(this.checkMode === 'toBe');
+        return true;
     }
 
-    // static member method to invoke the question
-    public static of() {
-        return new LoginStatus();
+    static get toBe() {
+        return new LoginStatus('toBe');
+    }
+
+    static get notToBe() {
+        return new LoginStatus('notToBe');
+    }
+
+    public successful(): LoginStatus {
+        return this;
     }
 }
 ```
@@ -221,7 +240,7 @@ test.describe('My Test', () => {
 
         await actor.attemptsTo(Login.toApp());
 
-        expect(await actor.asks(LoginStatus.of())).not.toBeNull();
+        await actor.asks(LoginStatus.toBe.successful());
     });
 });
 ```
