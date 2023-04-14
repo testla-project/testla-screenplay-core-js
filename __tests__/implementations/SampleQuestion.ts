@@ -9,7 +9,6 @@ export class SampleQuestion extends Question<boolean> {
     }
 
     public async answeredBy(actor: Actor): Promise<boolean> {
-        // TODO: correct ability loading from core question derrived
         const ability = UseAbility.as(actor, this.abilityAlias);
         const payload = await ability.getPayload();
         expect(this.val === payload).toBe(this.checkMode === 'toHave');

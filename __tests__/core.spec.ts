@@ -71,7 +71,7 @@ describe('Testing the core', () => {
         expect(hasError).toBe(true);
     });
 
-    // --- new alias functionality
+    // with alias functionality
 
     test('Register an ability (with alias) with an actor and use it via action', async () => {
         const TestActor = Actor.named('Test Actor')
