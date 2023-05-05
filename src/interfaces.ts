@@ -12,7 +12,7 @@ export interface IActor {
     asks<T>(question: IQuestion<T>, activityResult: T): Promise<T>;
 
     // connection to abilities
-    withAbilityTo(ability: IAbility): IAbility;
+    withAbilityTo(ability: IAbility, alias?: string): IAbility;
     can(ability: IAbility): IActor;
 
     // connection to tasks/actions
@@ -24,6 +24,8 @@ export interface IAbility {
     // call patterns and therefore there is no common ground
     // only the name attribute needs to be set for internal reference
     name: string;
+    // in addition aliases can be set
+    alias?: string;
 }
 
 /**

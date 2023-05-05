@@ -9,7 +9,7 @@ Testla screenplay core defines the frame for an implementation of the Screenplay
 
 The Screenplay Pattern is a user-centred approach to writing high-quality automated tests. It steers you towards an effective use of layers of abstraction, helps your tests capture the business vernacular, and encourages good testing and software engineering habits.
 
-Instead of focusing on low-level, interface-centric interactions, you describe your test scenarios in a similar way you'd describe them to a human being - an actor in Screenplay-speak. You write simple, readable and highly-reusable code that instructs the actors what activities to perform and what things to check. The domain-specific test language you create is used to express screenplays - the activities for the actors to perform in a given test scenario.
+Instead of focusing on low-level, interface-centric interactions, you describe your test scenarios in a similar way you'd describe them to a human being - an actor in Screenplay-language. You write simple, readable and highly-reusable code that instructs the actors what activities to perform and what things to check. The domain-specific test language you create is used to express screenplays - the activities for the actors to perform in a given test scenario.
 
 The Screenplay Pattern is beautiful in its simplicity. It's made up of five elements, five types of building blocks that Testla gives you to design any functional acceptance test you need, no matter how sophisticated or how simple.
 
@@ -26,7 +26,7 @@ Abilities are essential since they define _what_ an actor _can do_. So the first
 ```js
 import { Ability } from '@testla/screenplay';
 
-class MyBrowseAbility extends Ability {
+export class MyBrowseAbility extends Ability {
     private constructor(page: Page) {
         super();
         this.page = page;
@@ -76,7 +76,7 @@ The next step is to define actions and which can be grouped into tasks later. Ac
 ```js
 import { Action } from '@testla/screenplay';
 
-class Navigate extends Action {
+export class Navigate extends Action {
     // typescript requires class variable definitions
     private readonly url: string;
 
@@ -96,7 +96,7 @@ class Navigate extends Action {
     }
 }
 
-class Fill extends Action {
+export class Fill extends Action {
     // typescript requires class variable definitions
     private readonly locator: string;
     private readonly value: string;
@@ -118,7 +118,7 @@ class Fill extends Action {
     }
 }
 
-class Click extends Action {
+export class Click extends Action {
     // typescript requires class variable definitions
     private readonly locator: string;
 
@@ -138,7 +138,7 @@ class Click extends Action {
     }
 }
 
-class Find extends Action {
+export class Find extends Action {
     // typescript requires class variable definitions
     private readonly locator: string;
 
@@ -166,7 +166,7 @@ Tasks group actions into logical entities.
 ```js
 import { Task } from '@testla/screenplay';
 
-class Login extends Task {
+export class Login extends Task {
     // the actual implementation of the task
     public async performAs(actor: Actor): Promise<any> {
         return actor.attemptsTo(
@@ -191,15 +191,34 @@ Questions are used to check the status of the application under test.
 ```js
 import { Question } from '@testla/screenplay';
 
-class LoginStatus extends Question<any> {
-    // the actual implementation of the task
+export class LoginStatus extends Question<any> {
+    private constructor(private checkMode: 'toBe' | 'notToBe') {
+        super();
+    }
+    
+    // the actual implementation of the question
     public async answeredBy(actor: Actor): Promise<any> {
-        return BrowseTheWeb.as(actor).find('#logged-in-indicator');
+        let success = false;
+
+        try {
+            await MyBrowseAbility.as(actor).find('#logged-in-indicator');
+            success = true;
+        }
+
+        expect(success).toBe(this.checkMode === 'toBe');
+        return true;
     }
 
-    // static member method to invoke the question
-    public static of() {
-        return new LoginStatus();
+    static get toBe() {
+        return new LoginStatus('toBe');
+    }
+
+    static get notToBe() {
+        return new LoginStatus('notToBe');
+    }
+
+    public successful(): LoginStatus {
+        return this;
     }
 }
 ```
@@ -221,30 +240,40 @@ test.describe('My Test', () => {
 
         await actor.attemptsTo(Login.toApp());
 
-        expect(await actor.asks(LoginStatus.of())).not.toBeNull();
+        await actor.asks(LoginStatus.toBe.successful());
     });
 });
 ```
 
 ### What about the 'Screen' in 'Screenplay'?
 
-With screen is meant that all locators for page elements are held in specific files/collections. In our example from above we put the locators inline. A sample screen file for the Login task could look like this:
+With screen is meant that all locators for page elements are held in specific files/classes. In our example from above we put the locators inline. A sample screen class for the Login task could look like this:
 
 ```js
-const USERNAME_INPUT = '#username';
-const PASSWORD_INPUT = '#password';
-const LOGIN_BUTTON = '#login-button';
+export class MyScreen {
+    static USERNAME_INPUT = '#username';
+    static PASSWORD_INPUT = '#password';
+    static LOGIN_BUTTON = '#login-button';
+}
 ```
 
 Within the task the screen elements are then used as:
 
 ```js
+import { MyScreen as SCREEN } from '../../screenplay/ui/screen/Home';
+
+// ...
+
 public async performAs(actor: Actor): Promise<any> {
     return actor.attemptsTo(
         Navigate.to('https://www.my-fancy-url.com'),
         Fill.with(USERNAME_INPUT, actor.states('username') || ''),
         Fill.with(PASSWORD_INPUT, actor.states('passwird') || ''),
-        Click.on(LOGIN_BUTTON),
+        Click.on(SCREEN.LOGIN_BUTTON),
     );
 }
 ```
+
+## Detailed explaination of the internal call flow
+
+To understand the internal component call flow better please refer to the [flow guide](./doc/flows.md). This guide also provides detailed information about how to use aliases for abilities.
