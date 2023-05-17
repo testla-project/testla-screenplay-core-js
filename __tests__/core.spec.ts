@@ -60,6 +60,15 @@ describe('Testing the core', () => {
         await TestActor.asks(SampleQuestion.notToHave.payload('test1'));
     });
 
+    test('Register an ability with an actor and ask 2 questions at the same time', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test'));
+        await TestActor.asks(
+            SampleQuestion.toHave.payload('test'),
+            SampleQuestion.notToHave.payload('test1'),
+        );
+    });
+
     test('Try using a question without actor having the corresponding ability assigned', async () => {
         let hasError = false;
         const TestActor = Actor.named('Test Actor');

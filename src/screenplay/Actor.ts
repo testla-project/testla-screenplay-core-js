@@ -105,7 +105,13 @@ export class Actor implements IActor {
      *
      * @param question the question to ask.
      */
-    public async asks<T>(question: IQuestion<T>): Promise<T> {
-        return question.answeredBy(this);
+    public async asks<T>(...questions: IQuestion<T>[]): Promise<T> {
+        // execute each activity in order.
+        const reducefn = async (chain: Promise<any>, question: IQuestion<T>): Promise<any> => chain.then(async (): Promise<any> => {
+            const innerRes = await question.answeredBy(this);
+            return Promise.resolve(innerRes);
+        });
+        const attempsRes = await questions.reduce(reducefn, Promise.resolve());
+        return Promise.resolve(attempsRes);
     }
 }
