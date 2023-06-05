@@ -6,11 +6,11 @@ export class WrapperTask extends Task {
     private activities: (Task | Action)[] = [
         UtilizeAction.getAbilityPayload(),
     ];
-    
+
     // eslint-disable-next-line class-methods-use-this
     public async performAs(actor: Actor): Promise<any> {
         // provide the ability alias to all activities
-        this.activities.forEach(activity => {
+        this.activities.forEach((activity) => {
             activity.withAbilityAlias(this.abilityAlias);
         });
 
