@@ -121,4 +121,32 @@ describe('Testing the core', () => {
         await TestActor.asks(SampleQuestion.toHave.payload('test'));
         await TestActor.asks(SampleQuestion.toHave.payload('test with alias').withAbilityAlias('test alias'));
     });
+
+
+    test.only('Retry test', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test'))
+
+        const res = await TestActor.retries(
+
+            TestActor.asks(
+                SampleQuestion.toHave.payload('test'),
+            ),
+
+            TestActor.attemptsTo(
+                UtilizeAction.setAbilityPayload('hi2'),
+                UtilizeAction.getAbilityPayload()
+            ),
+
+            TestActor.attemptsTo(
+                UtilizeAction.setAbilityPayload('hi4'),
+                UtilizeAction.getAbilityPayload()
+            ),
+
+            TestActor.asks(
+                SampleQuestion.toHave.payload('test2')
+            ),
+        )
+        console.log(res);
+    }, 50000);
 });

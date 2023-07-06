@@ -9,7 +9,8 @@ export interface IActor {
     states(key: string): any;
 
     // connection to questions
-    asks<T>(question: IQuestion<T>, activityResult: T): Promise<T>;
+    // asks<T>(question: IQuestion<T>, activityResult: T): Promise<T>;
+    asks<T>(...questions: IQuestion<T>[]): Promise<T>;
 
     // connection to abilities
     withAbilityTo(ability: IAbility, alias?: string): IAbility;

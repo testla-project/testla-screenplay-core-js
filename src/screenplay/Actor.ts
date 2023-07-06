@@ -1,6 +1,15 @@
 import {
     IActor, IAbility, IAction, IQuestion, ITask,
 } from '../interfaces';
+import { retry, retryAsync } from 'ts-retry';
+import { Action } from './Action';
+import { Question } from './Question';
+import { Task } from './Task';
+
+// both
+// type Retryable = ((...activities: (ITask | IAction)[]) => Promise<any>) | ((...questions: IQuestion<boolean>[]) => Promise<any>);
+type Retryable<T> = Promise<any> | Promise<T>;
+
 
 /**
  * Actors use abilities in order to execute tasks/actions and answer questions.
@@ -87,6 +96,43 @@ export class Actor implements IActor {
         return Promise.resolve(attempsRes);
     }
 
+
+    public async retries<T>(...retryables: Retryable<T>[]): Promise<any> {
+        let res: any | undefined = undefined;
+        console.log(retryables);
+        const execResult = await this.executeRetry(async (): Promise<any> => {
+            // const results = await retryables.map(async (retryable: Retryable): Promise<any> => {
+            //     console.log((retryable instanceof Action) || (retryable instanceof Question)); // prints true if retryable is either an action or a Question
+            //     if (retryable instanceof Action) {
+            //         res = await this.attemptsTo(retryable);
+            //         console.log(res);
+            //         return res!;
+            //     } else if (retryable instanceof Question) {
+            //         res = this.asks(retryable);
+            //         console.log(res);
+            //         return res!;
+            //     } else {
+            //         console.log('no match');
+            //         return undefined;
+            //     }
+                
+            //     return res!;
+            // });
+            const results = await retryables.map(async (retryable: Retryable<T>): Promise<any> => {
+                // PROBLEM: await retryable != Actor.asks...
+                // this should actually be smth like (if retryable instanceof Question/Action, then this.attemptsTo), but retryable is Promise<pending>, so this won't work.
+                //if (retryable. instanceof Action)
+                res = await retryable;
+                console.log('RESULT:' + res);
+                return res;
+            });
+            console.log
+            await Promise.all(results);
+            return res; // return the last result of the map
+        });
+        return Promise.resolve(execResult!);
+    }
+
     /**
      * Verify if the actor has the given ability.
      *
@@ -105,7 +151,60 @@ export class Actor implements IActor {
      *
      * @param question the question to ask.
      */
-    public async asks<T>(question: IQuestion<T>): Promise<T> {
-        return question.answeredBy(this);
+    // public async asks<T>(question: IQuestion<T>): Promise<T> {
+        // return question.answeredBy(this);
+
+    public async asks<T>(...questions: IQuestion<any>[]): Promise<T> {
+        console.log("asks");
+        // execute each question in order.
+        const reducefn = async (chain: Promise<any>, question: IQuestion<T>): Promise<any> => chain.then(async (): Promise<T> => {
+            const innerRes = await question.answeredBy(this);
+            return Promise.resolve(innerRes);
+        });
+        const asksRes = await questions.reduce(reducefn, Promise.resolve());
+        return Promise.resolve(asksRes);
     }
+
+    /**
+     * Helper function for the retry functionality.
+     * @param delay 
+     * @param maxTry 
+     * @param fn 
+     * @returns 
+     */
+    private async executeRetry(fn: () => Promise<boolean>, maxTry: number = 5, delay: number = 2000, ): Promise<any> {
+        try {
+            await retryAsync(fn, { delay, maxTry });
+            return true;
+        } catch (err) {
+            console.log('catch!');
+            return false;
+        }
+    };
+
+    // /**
+    //  * Helper function for the retry functionality.
+    //  * @param delay 
+    //  * @param maxTry 
+    //  * @param fn 
+    //  * @returns 
+    //  */
+    // private async promiseRetry(fn: () => Promise<any>, maxTry: number = 5, delay: number = 2000): Promise<any> {
+    //     if (maxTry <= 0) {
+    //         return false;
+    //     }
+
+    //     try {
+    //         const result = await fn();
+    //         return result;
+    //     }
+    //     catch (err) {
+    //         console.log('catch!');
+    //         // delay
+    //         await new Promise(resolve => setTimeout(resolve, delay));
+    //         console.log('Retrying..' + maxTry);
+    //         return this.promiseRetry(fn, (maxTry-1), delay)
+    //     }
+    // }
+
 }
