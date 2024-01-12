@@ -1,3 +1,8 @@
+import {
+    IAction, ILogable, IQuestion, ITask, IActor,
+} from '../interfaces';
+import { printCallStack } from './call-stack';
+
 const blanksPerLevel = 4;
 
 let indentationLevel = 0;
@@ -16,10 +21,18 @@ const blankifyMsg = (msg: string, level: number) => {
     return finalMsg;
 };
 
-const log = (msg: string): void => {
+const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable): void => {
     if (!process.env.DEBUG?.includes('testla:screenplay')) {
         return;
     }
+
+    const msg = `${
+        actor.attributes.name
+    } attemptsTo ${
+        element.constructor.name
+    }${
+        printCallStack(element.callStack)
+    }`;
 
     process.stdout.write(`[TESTLA/SCREENPLAY]${blankifyMsg(msg, indentationLevel)}\n`);
 };

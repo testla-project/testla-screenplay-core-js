@@ -17,13 +17,13 @@ export class UtilizeAction extends Action {
 
     public static getAbilityPayload(): UtilizeAction {
         const instance = new UtilizeAction();
-        instance.callStack.calledWith = {};
+        instance.setCallStackInitializeCalledWith({});
         return instance;
     }
 
     public static setAbilityPayload(payload: any): UtilizeAction {
         const instance = new UtilizeAction('set', payload);
-        instance.callStack.calledWith = { payload };
+        instance.setCallStackInitializeCalledWith({ payload });
         return instance;
     }
 }
