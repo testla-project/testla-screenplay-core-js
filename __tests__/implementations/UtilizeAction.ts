@@ -16,10 +16,14 @@ export class UtilizeAction extends Action {
     }
 
     public static getAbilityPayload(): UtilizeAction {
-        return new UtilizeAction();
+        const instance = new UtilizeAction();
+        instance.callStack.calledWith = {};
+        return instance;
     }
 
     public static setAbilityPayload(payload: any): UtilizeAction {
-        return new UtilizeAction('set', payload);
+        const instance = new UtilizeAction('set', payload);
+        instance.callStack.calledWith = { payload };
+        return instance;
     }
 }

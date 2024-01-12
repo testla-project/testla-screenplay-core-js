@@ -1,10 +1,18 @@
-import { ITask, IActor } from '../interfaces';
+import { ITask, IActor, CallStackInfo } from '../interfaces';
 import { UsingAlias } from '../templates/UsingAlias';
+import { identifyCaller } from '../utils/call-stack';
 
 /**
  * Tasks can be triggered by calling them from an actor object.
  */
 export abstract class Task extends UsingAlias implements ITask {
+    callStack: CallStackInfo;
+
+    constructor() {
+        super();
+        this.callStack = { caller: identifyCaller() };
+    }
+
     /**
      *  Makes the provided {@link IActor}
      *  perform this Task.

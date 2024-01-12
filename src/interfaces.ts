@@ -19,6 +19,17 @@ export interface IActor {
     attemptsTo(...activities: (ITask | IAction)[]): Promise<any>;
 }
 
+export type CallStackInfo = {
+    // the called function i.e. the static function to initialize actions/tasks/questions
+    caller: string;
+    // an object holding key/value pairs for all input attributes
+    calledWith?: { [key: string]: any };
+};
+
+export interface ILogable {
+    callStack?: CallStackInfo;
+}
+
 export interface IAbility {
     // this is an empty interface, since every ability has its own
     // call patterns and therefore there is no common ground
@@ -31,7 +42,7 @@ export interface IAbility {
 /**
  * An object representing an action that an {@link IActor} can perform.
  */
-export interface IAction {
+export interface IAction extends ILogable {
     /**
      *  Makes the provided {@link IActor}
      *  perform this Action.
@@ -47,7 +58,7 @@ export interface IAction {
 /**
  * An object representing a task that an {@link IActor} can perform.
  */
-export interface ITask {
+export interface ITask extends ILogable {
     /**
      *  Makes the provided {@link IActor}
      *  perform this Task.

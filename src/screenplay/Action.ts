@@ -1,10 +1,20 @@
-import { IAction, IActor } from '../interfaces';
+import {
+    IAction, IActor, CallStackInfo,
+} from '../interfaces';
 import { UsingAlias } from '../templates/UsingAlias';
+import { identifyCaller } from '../utils/call-stack';
 
 /**
  * Actions can be triggered by calling them from an actor object.
  */
 export abstract class Action extends UsingAlias implements IAction {
+    callStack: CallStackInfo;
+
+    constructor() {
+        super();
+        this.callStack = { caller: identifyCaller() };
+    }
+
     /**
      *  Makes the provided {@link IActor}
      *  perform this Action.

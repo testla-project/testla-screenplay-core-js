@@ -1,6 +1,8 @@
 import {
     IActor, IAbility, IAction, IQuestion, ITask,
 } from '../interfaces';
+import log, { indentationLevelDown, indentationLevelUp } from '../utils/logger';
+import { Task } from './Task';
 
 /**
  * Actors use abilities in order to execute tasks/actions and answer questions.
@@ -80,7 +82,29 @@ export class Actor implements IActor {
     public async attemptsTo(...activities: (ITask | IAction)[]): Promise<any> {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, activity: ITask | IAction): Promise<any> => chain.then(async (): Promise<any> => {
+            const activityName = activity.constructor.name;
+
+            log(`${
+                this.attributes.name
+            } attemptsTo ${
+                activityName
+            }.${activity.callStack?.caller}(${
+                Object.entries(activity.callStack?.calledWith || {})
+                    .map(([key, value]) => `${key}: ${
+                        typeof value === 'string' ? `'${value}'` : value
+                    }`)
+            })`);
+
+            if (activity instanceof Task) {
+                indentationLevelUp();
+            }
+
             const innerRes = await activity.performAs(this);
+
+            if (activity instanceof Task) {
+                indentationLevelDown();
+            }
+
             return Promise.resolve(innerRes);
         });
         const attempsRes = await activities.reduce(reducefn, Promise.resolve());
