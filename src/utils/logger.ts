@@ -5,34 +5,57 @@ import {
 import { Question } from '../screenplay/Question';
 import { printCallStack, printFilePath } from './call-stack';
 
-const blanksPerLevel = 4;
+const BLANKS_PER_LEVEL = 4;
 
+/**
+ * Current indentation level
+ */
 let indentationLevel = 0;
 
+/**
+ * Highers the indentation level
+ */
 export const indentationLevelUp = (): void => { indentationLevel += 1; };
 
+/**
+ * Lowers the indentation level
+ */
 export const indentationLevelDown = (): void => { indentationLevel -= 1; };
 
+/**
+ * Indents a message based on the indentation level
+ * @param msg the message to be indented
+ * @param level the indentation level
+ * @returns final formatted message
+ */
 const blankifyMsg = (msg: string, level: number) => {
     let finalMsg = msg;
 
-    for (let i = 0; i <= level * blanksPerLevel; i += 1) {
+    for (let i = 0; i <= level * BLANKS_PER_LEVEL; i += 1) {
         finalMsg = ` ${finalMsg}`;
     }
 
     return finalMsg;
 };
 
+/**
+ * @returns current time (UTC)
+ */
 const printCurrentTime = () => (new Date())
     .toISOString()
     .substring(11, 23);
 
-const BASH_GRAY = '\x1B[90m';
+const BASH_COLOR = {
+    GRAY: '\x1B[90m',
+    BLUE: '\x1B[94m',
+    RESET: '\x1B[0m',
+};
 
-const BASH_RESET = '\x1B[0m';
-
-const BASH_BLUE = '\x1B[94m';
-
+/**
+ * Writes the log information directly to stdout
+ * @param actor THe actor who triggered an executable
+ * @param element The executable
+ */
 const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable): void => {
     if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
         return;
@@ -52,7 +75,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         printCallStack(element.callStack)
     }`;
 
-    process.stdout.write(`${BASH_BLUE}testla:sp${BASH_GRAY} ${printCurrentTime()}${BASH_RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_GRAY}${printFilePath(element.callStack)}${BASH_RESET}\n`);
+    process.stdout.write(`${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}${BASH_COLOR.RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}\n`);
 };
 
 export default log;
