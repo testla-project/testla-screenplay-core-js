@@ -31,6 +31,8 @@ const BASH_GRAY = '\x1B[90m';
 
 const BASH_RESET = '\x1B[0m';
 
+const BASH_BLUE = '\x1B[94m';
+
 const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable): void => {
     if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
         return;
@@ -50,7 +52,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         printCallStack(element.callStack)
     }`;
 
-    process.stdout.write(`${BASH_GRAY}[SCREENPLAY ⏱ ${printCurrentTime()}]${BASH_RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_GRAY}${printFilePath(element.callStack)}${BASH_RESET}\n`);
+    process.stdout.write(`${BASH_BLUE}testla:sp${BASH_GRAY} ${printCurrentTime()}${BASH_RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_GRAY}${printFilePath(element.callStack)}${BASH_RESET}\n`);
 };
 
 export default log;

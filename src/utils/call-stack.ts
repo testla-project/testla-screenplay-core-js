@@ -1,20 +1,24 @@
 import { CallStackInfo } from '../interfaces';
 
-const RELEVANT_LINE_IN_STACK = 6;
+const RELEVANT_CALLER_LINE_IN_STACK = 6;
+
+const RELEVANT_FILE_LINE_IN_STACK = RELEVANT_CALLER_LINE_IN_STACK + 1;
 
 export const identifyCaller = (): { caller: string; file?: string; } => {
-    const callerLine = new Error().stack?.split('\n')[RELEVANT_LINE_IN_STACK].trim();
+    const { stack } = new Error();
+    const callerLine = stack?.split('\n')[RELEVANT_CALLER_LINE_IN_STACK].trim();
+    const fileLine = stack?.split('\n')[RELEVANT_FILE_LINE_IN_STACK].trim();
     const isQuestion = (callerLine || '').includes('Function.get ');
 
     const CALLER_REGEX = !isQuestion
         ? /at Function.(.+) \(/
         : /at Function.get (.+) \[as/;
 
-    const FILE_REGEX = /\((.+)\)/;
+    const FILE_REGEX = /at (.+)/;
 
     // eslint-disable-next-line
     const callerName = callerLine?.match(CALLER_REGEX);
-    const fileName = callerLine?.match(FILE_REGEX);
+    const fileName = fileLine?.match(FILE_REGEX);
 
     return {
         caller: callerName ? callerName[1] : 'unknown',
@@ -45,7 +49,7 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
 
 export const printFilePath = (callStack?: CallStackInfo[]): string => {
     if (callStack && callStack[0]?.file) {
-        return `(${callStack[0].file})`;
+        return `(${callStack[0].file.split('/').slice(-1)})`;
     }
     return '';
 };
