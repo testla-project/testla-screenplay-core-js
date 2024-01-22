@@ -13,7 +13,7 @@ export class UsingAlias extends UsingLogging {
     public withAbilityAlias(alias: string | undefined) {
         this.abilityAlias = alias;
 
-        if (alias && this.callStack) {
+        if (alias) {
             this.addToCallStack({ caller: 'withAbilityAlias', calledWith: { alias } });
         }
 

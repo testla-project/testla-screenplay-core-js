@@ -1,3 +1,4 @@
+import { LOGGING_IDENTIFIER } from '../constants';
 import { CallStackCalledWith, CallStackInfo } from '../interfaces';
 import { identifyCaller } from '../utils/call-stack';
 
@@ -5,11 +6,11 @@ export class UsingLogging {
     callStack?: CallStackInfo[];
 
     constructor() {
-        if (!process.env.DEBUG?.includes('testla:screenplay')) {
+        if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
             return;
         }
 
-        this.callStack = [{ caller: identifyCaller() }];
+        this.callStack = [identifyCaller()];
     }
 
     setCallStackInitializeCalledWith(calledWith: CallStackCalledWith) {

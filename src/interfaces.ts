@@ -26,6 +26,8 @@ export type CallStackInfo = {
     caller: string;
     // an object holding key/value pairs for all input attributes
     calledWith?: CallStackCalledWith;
+    // the file where the caller is lovcated
+    file?: string;
 };
 
 export interface ILogable {
