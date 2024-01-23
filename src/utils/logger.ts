@@ -5,6 +5,9 @@ import {
 import { Question } from '../screenplay/Question';
 import { printCallStack, printFilePath } from './call-stack';
 
+// base indentation to match the pw:api indentation
+const BASE_INDENTATION = '  ';
+
 const BLANKS_PER_LEVEL = 4;
 
 /**
@@ -75,7 +78,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         printCallStack(element.callStack)
     }`;
 
-    process.stdout.write(`${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}${BASH_COLOR.RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}\n`);
+    process.stdout.write(`${BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}${BASH_COLOR.RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}\n`);
 };
 
 export default log;

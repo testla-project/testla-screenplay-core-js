@@ -2,7 +2,12 @@ import { CallStackInfo } from '../interfaces';
 
 const RELEVANT_CALLER_LINE_IN_STACK = 6;
 
-const RELEVANT_FILE_LINE_IN_STACK = RELEVANT_CALLER_LINE_IN_STACK + 1;
+const identifyCallerLine = (lines?: string[]): number => {
+    if (lines) {
+        return lines.findIndex((line: string) => line.includes('at Function.'));
+    }
+    return RELEVANT_CALLER_LINE_IN_STACK;
+};
 
 /**
  * Identifies the current caller information
@@ -10,8 +15,11 @@ const RELEVANT_FILE_LINE_IN_STACK = RELEVANT_CALLER_LINE_IN_STACK + 1;
  */
 export const identifyCaller = (): { caller: string; file?: string; } => {
     const { stack } = new Error();
-    const callerLine = stack?.split('\n')[RELEVANT_CALLER_LINE_IN_STACK].trim();
-    const fileLine = stack?.split('\n')[RELEVANT_FILE_LINE_IN_STACK].trim();
+    const stackLines = stack?.split('\n') || [''];
+    const callerLineNo = identifyCallerLine(stackLines);
+    const fileLineNo = callerLineNo + 1;
+    const callerLine = stackLines[callerLineNo].trim();
+    const fileLine = stackLines[fileLineNo].trim();
     const isQuestion = (callerLine || '').includes('Function.get ');
 
     const CALLER_REGEX = !isQuestion
@@ -50,6 +58,7 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
                 .map(([key, value]) => `${key}: ${
                     typeof value === 'string' ? `'${value}'` : value
                 }`)
+                .join(', ')
         }${
             info.calledWith ? ')' : ''
         }`)
