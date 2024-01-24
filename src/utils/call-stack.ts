@@ -1,12 +1,14 @@
 import { CallStackInfo } from '../interfaces';
 
-const RELEVANT_CALLER_LINE_IN_STACK = 6;
+const FILE_REGEX = /at (.+)/;
+const CALLER_REGEX_NON_QUESTION = /at Function.(.+) \(/;
+const CALLER_REGEX_QUESTION = /at Function.get (.+) \[as/;
 
 const identifyCallerLine = (lines?: string[]): number => {
     if (lines) {
         return lines.findIndex((line: string) => line.includes('at Function.'));
     }
-    return RELEVANT_CALLER_LINE_IN_STACK;
+    return -1;
 };
 
 /**
@@ -22,14 +24,12 @@ export const identifyCaller = (): { caller: string; file?: string; } => {
     const fileLine = stackLines[fileLineNo].trim();
     const isQuestion = (callerLine || '').includes('Function.get ');
 
-    const CALLER_REGEX = !isQuestion
-        ? /at Function.(.+) \(/
-        : /at Function.get (.+) \[as/;
-
-    const FILE_REGEX = /at (.+)/;
+    const callerRegex = !isQuestion
+        ? CALLER_REGEX_NON_QUESTION
+        : CALLER_REGEX_QUESTION;
 
     // eslint-disable-next-line
-    const callerName = callerLine?.match(CALLER_REGEX);
+    const callerName = callerLine?.match(callerRegex);
     const fileName = fileLine?.match(FILE_REGEX);
 
     return {

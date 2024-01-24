@@ -1,14 +1,12 @@
-import { LOGGING_IDENTIFIER } from '../constants';
+import {
+    BASH_COLOR, LOGGING_BASE_INDENTATION,
+    LOGGING_BLANKS_PER_INDENTATION_LEVEL, LOGGING_IDENTIFIER,
+} from '../constants';
 import {
     IAction, ILogable, IQuestion, ITask, IActor,
 } from '../interfaces';
 import { Question } from '../screenplay/Question';
 import { printCallStack, printFilePath } from './call-stack';
-
-// base indentation to match the pw:api indentation
-const BASE_INDENTATION = '  ';
-
-const BLANKS_PER_LEVEL = 4;
 
 /**
  * Current indentation level
@@ -34,7 +32,7 @@ export const indentationLevelDown = (): void => { indentationLevel -= 1; };
 const blankifyMsg = (msg: string, level: number) => {
     let finalMsg = msg;
 
-    for (let i = 0; i <= level * BLANKS_PER_LEVEL; i += 1) {
+    for (let i = 0; i <= level * LOGGING_BLANKS_PER_INDENTATION_LEVEL; i += 1) {
         finalMsg = ` ${finalMsg}`;
     }
 
@@ -47,12 +45,6 @@ const blankifyMsg = (msg: string, level: number) => {
 const printCurrentTime = () => (new Date())
     .toISOString()
     .substring(11, 23);
-
-const BASH_COLOR = {
-    GRAY: '\x1B[90m',
-    BLUE: '\x1B[94m',
-    RESET: '\x1B[0m',
-};
 
 /**
  * Writes the log information directly to stdout
@@ -78,7 +70,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         printCallStack(element.callStack)
     }`;
 
-    process.stdout.write(`${BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}${BASH_COLOR.RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}\n`);
+    process.stdout.write(`${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}${BASH_COLOR.RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}\n`);
 };
 
 export default log;
