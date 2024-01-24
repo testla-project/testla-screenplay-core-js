@@ -1,10 +1,10 @@
-import { ITask, IActor } from '../interfaces';
+import { ITask, IActor, ILogable } from '../interfaces';
 import { UsingAlias } from '../templates/UsingAlias';
 
 /**
  * Tasks can be triggered by calling them from an actor object.
  */
-export abstract class Task extends UsingAlias implements ITask {
+export abstract class Task extends UsingAlias implements ITask, ILogable {
     /**
      *  Makes the provided {@link IActor}
      *  perform this Task.

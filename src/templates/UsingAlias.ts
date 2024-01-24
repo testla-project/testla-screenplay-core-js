@@ -1,4 +1,6 @@
-export class UsingAlias {
+import { UsingLogging } from './UsingLogging';
+
+export class UsingAlias extends UsingLogging {
     // value which will be forwared to call the actual ability by its alias
     public abilityAlias?: string;
 
@@ -10,6 +12,11 @@ export class UsingAlias {
      */
     public withAbilityAlias(alias: string | undefined) {
         this.abilityAlias = alias;
+
+        if (alias) {
+            this.addToCallStack({ caller: 'withAbilityAlias', calledWith: { alias } });
+        }
+
         return this;
     }
 }

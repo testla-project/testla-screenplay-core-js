@@ -25,6 +25,7 @@ export class SampleQuestion extends Question<boolean> {
 
     public payload(val: any): SampleQuestion {
         this.val = val;
+        this.addToCallStack({ caller: 'payload', calledWith: { val } });
         return this;
     }
 }

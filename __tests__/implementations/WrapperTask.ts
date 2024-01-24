@@ -20,6 +20,8 @@ export class WrapperTask extends Task {
     }
 
     public static execute(): WrapperTask {
-        return new WrapperTask();
+        const instance = new WrapperTask();
+        instance.setCallStackInitializeCalledWith({});
+        return instance;
     }
 }

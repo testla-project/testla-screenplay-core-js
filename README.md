@@ -229,6 +229,16 @@ test.describe('My Test', () => {
 
 To understand the internal component call flow better please refer to the [flow guide](./doc/flows.md). This guide also provides detailed information about how to use aliases for abilities.
 
+## Logging
+
+Testla comes with logging which helps you to debug your test code. When logging is enabled all activities an actor triggers are logged in a comprehensive way to stdout. To enable logging set the DEBUG environment variable as follows:
+
+```typescript
+DEBUG=testla:sp
+```
+
+To understand how to enable logging in custom Actions and Questions please refer to the [logging guide](./doc/logging.md).
+
 ---
 
 # Credits

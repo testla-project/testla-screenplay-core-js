@@ -19,6 +19,21 @@ export interface IActor {
     attemptsTo(...activities: (ITask | IAction)[]): Promise<any>;
 }
 
+export type CallStackCalledWith = { [key: string]: any };
+
+export type CallStackInfo = {
+    // the called function i.e. the static function to initialize actions/tasks/questions
+    caller: string;
+    // an object holding key/value pairs for all input attributes
+    calledWith?: CallStackCalledWith;
+    // the file where the caller is lovcated
+    file?: string;
+};
+
+export interface ILogable {
+    callStack?: CallStackInfo[];
+}
+
 export interface IAbility {
     // this is an empty interface, since every ability has its own
     // call patterns and therefore there is no common ground
