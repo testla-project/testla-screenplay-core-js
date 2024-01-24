@@ -1,29 +1,37 @@
-# Testla Screenplay
+# Testla
 
 ## Introduction
 
-The testla project is a collection of tools of different tools to help in the QA automation process.
-Testla screenplay core defines the frame for an implementation of the Screenplay Pattern.
+The testla project is a collection of tools to help in the QA automation process.
+testla screenplay core defines the frame for an implementation of the Screenplay Pattern.
 
-## What is Screenplay Pattern and how does it work?
+## Screenplay Pattern Overview
 
-The Screenplay Pattern is a user-centred approach to writing high-quality automated tests. It steers you towards an effective use of layers of abstraction, helps your tests capture the business vernacular, and encourages good testing and software engineering habits.
+The Screenplay Pattern is a design pattern for automatic interacting with software products. It can handle any type of interaction - (Web-) UI, API. Test automation is the most popular use case for the pattern. 
 
-Instead of focusing on low-level, interface-centric interactions, you describe your test scenarios in a similar way you'd describe them to a human being - an actor in Screenplay-language. You write simple, readable and highly-reusable code that instructs the actors what activities to perform and what things to check. The domain-specific test language you create is used to express screenplays - the activities for the actors to perform in a given test scenario.
+## The Design
 
-The Screenplay Pattern is beautiful in its simplicity. It's made up of five elements, five types of building blocks that Testla gives you to design any functional acceptance test you need, no matter how sophisticated or how simple.
+The Screenplay Pattern can be summarized in one line: Actors use Abilities to perform Interactions. 
+- **Actors**, initiate Interactions
+- **Abilities**, enable Actors to initiate Interactions
+- **Interactions** are procedures that exercise the behaviors under test
+  - **Tasks**, executes Actions on the features under test
+  - **Actions**, use Locators, Requests, etc. to interact with the features under Test
+  - **Questions**, return state about the features under test
 
-The key elements of the pattern are: actors, abilities, tasks, actions and questions.
+The diagram below illustrates how these parts fit together:
 
-![Screenplay Pattern](/doc/screenplay.png)
+![Screenplay Pattern](./doc/assets/screenplay.png)
 
-## How to use this package?
+### Actors and Abilities
 
-### Define an ability
+The Screenplay Pattern is a user-centric model with users and external systems interacting with the system under test represented as actors. `Actors` are a key element of the pattern as they are the ones performing the test scenarios.
 
-Abilities are essential since they define _what_ an actor _can do_. So the first thing we need to do is to define an ability by extending the testla ability.
+Actors need `abilities` to enable them interacting with any interface of the system. How does it know how to connect your actors to those interfaces? Well, it doesn't unless you tell it, and that's where abilities come into play.
 
-```js
+#### Define your own ability
+
+```typescript
 import { Ability } from '@testla/screenplay';
 
 export class MyBrowseAbility extends Ability {
@@ -69,11 +77,21 @@ export class MyBrowseAbility extends Ability {
 }
 ```
 
-### Define actions
+#### Defining an Actor with an Ability
 
-The next step is to define actions and which can be grouped into tasks later. Actions use abilities to perform actual activities.
+For example, Ute will interact with the Web UI using the above defined ability. 
 
-```js
+```typescript
+const Ute = Actor.named('Ute').can(MyBrowseAbility.using(page));
+```
+
+### Custom Actions
+
+#### How to define a custom action
+
+`Abilities` enable actors to perform `actions` with the system under test. `Actions` are command objects that instruct an actor how to use their abilities to perform the given activity. 
+
+```typescript
 import { Action } from '@testla/screenplay';
 
 export class Navigate extends Action {
@@ -95,75 +113,23 @@ export class Navigate extends Action {
         return new Navigate(url);
     }
 }
-
-export class Fill extends Action {
-    // typescript requires class variable definitions
-    private readonly locator: string;
-    private readonly value: string;
-
-    private constructor(locator: string, value: string) {
-        super();
-        this.locator = locator;
-        this.value = value;
-    }
-
-    // the actual implementation of the action
-    public performAs(actor: Actor): Promise<any> {
-        return MyBrowseAbility.as(actor).fill(this.locator, this.value);
-    }
-
-    // static member method to invoke the action
-    public static with(locator: string, value: string): Fill {
-        return new Fill(locator, value);
-    }
-}
-
-export class Click extends Action {
-    // typescript requires class variable definitions
-    private readonly locator: string;
-
-    private constructor(locator: string) {
-        super();
-        this.locator = locator;
-    }
-
-    // the actual implementation of the action
-    public performAs(actor: Actor): Promise<any> {
-        return MyBrowseAbility.as(actor).click(this.locator);
-    }
-
-    // static member method to invoke the action
-    public static on(locator: string): Click {
-        return new Click(locator);
-    }
-}
-
-export class Find extends Action {
-    // typescript requires class variable definitions
-    private readonly locator: string;
-
-    private constructor(locator: string) {
-        super();
-        this.locator = locator;
-    }
-
-    // the actual implementation of the action
-    public performAs(actor: Actor): Promise<any> {
-        return MyBrowseAbility.as(actor).find(this.locator);
-    }
-
-    // static member method to invoke the action
-    public static element(locator: string): Find {
-        return new Find(locator);
-    }
-}
 ```
 
-### Define a task
+#### How to use the custom action
 
-Tasks group actions into logical entities.
+Here, we instruct Ute to use the action to navigate to a web page. 
 
-```js
+```typescript
+await Ute.attemptsTo(Navigate.to('https://example.com'));
+```
+
+### Custom Tasks
+
+#### How to define a custom task
+
+`Tasks` model sequences of activities and help you capture meaningful steps of an actor workflow in your domain. Typically, tasks correspond to higher-level, business domain-specific activities like to `SignUp`, `PlaceATrade`, `TransferFunds`, and so on. 
+
+```typescript
 import { Task } from '@testla/screenplay';
 
 export class Login extends Task {
@@ -183,12 +149,21 @@ export class Login extends Task {
     }
 }
 ```
+#### How to use the custom task
 
-### Define a question
+Here, we instruct Ute to go through the login flow of an app. 
 
-Questions are used to check the status of the application under test.
+```typescript
+await Ute.attemptsTo(Login.toApp());
+```
 
-```js
+### Custom Questions
+
+#### How to define a custom question
+
+Apart from enabling interactions, abilities also enable actors to answer questions about the state of the system under test. 
+
+```typescript
 import { Question } from '@testla/screenplay';
 
 export class LoginStatus extends Question<any> {
@@ -223,57 +198,38 @@ export class LoginStatus extends Question<any> {
 }
 ```
 
-### Define a test case
+#### How to use the custom question
 
-The final step is to define a test case using the Actions and Abilities defined above.
+For example, we could instruct Ute to ask the question about the last response status. 
 
-```js
+```typescript
+await Ute.asks(LoginStatus.toBe.successful());
+```
+
+### Write your first test
+
+```typescript
 import { Actor } from "@testla/screenplay";
 
-// Example test case with Playwright
 test.describe('My Test', () => {
     test('My first test', async ({ page }) => {
-        const actor = Actor.named('James')
-            .with('username', 'John Doe')
-            .with('password', 'MySecretPassword');
+        const ute = Actor.named('Ute')
+            .with('username', 'ute')
+            .with('password', 'ute-password');
             .can(MyBrowseAbility.using(page));
 
-        await actor.attemptsTo(Login.toApp());
+        await ute.attemptsTo(Login.toApp());
 
-        await actor.asks(LoginStatus.toBe.successful());
+        await ute.asks(LoginStatus.toBe.successful());
     });
 });
 ```
 
-### What about the 'Screen' in 'Screenplay'?
-
-With screen is meant that all locators for page elements are held in specific files/classes. In our example from above we put the locators inline. A sample screen class for the Login task could look like this:
-
-```js
-export class MyScreen {
-    static USERNAME_INPUT = '#username';
-    static PASSWORD_INPUT = '#password';
-    static LOGIN_BUTTON = '#login-button';
-}
-```
-
-Within the task the screen elements are then used as:
-
-```js
-import { MyScreen as SCREEN } from '../../screenplay/ui/screen/Home';
-
-// ...
-
-public async performAs(actor: Actor): Promise<any> {
-    return actor.attemptsTo(
-        Navigate.to('https://www.my-fancy-url.com'),
-        Fill.with(USERNAME_INPUT, actor.states('username') || ''),
-        Fill.with(PASSWORD_INPUT, actor.states('passwird') || ''),
-        Click.on(SCREEN.LOGIN_BUTTON),
-    );
-}
-```
-
-## Detailed explaination of the internal call flow
+### Detailed explaination of the internal call flow
 
 To understand the internal component call flow better please refer to the [flow guide](./doc/flows.md). This guide also provides detailed information about how to use aliases for abilities.
+
+---
+
+# Credits
+This library is inspired by the [Screenplay Pattern](https://serenity-js.org/handbook/design/screenplay-pattern/) as described by Jan Molak and the [Serenity/JS](https://serenity-js.org/) implementation of it. 
