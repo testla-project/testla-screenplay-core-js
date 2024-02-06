@@ -47,19 +47,38 @@ const printCurrentTime = () => (new Date())
     .substring(11, 23);
 
 /**
+ * @param status of the activity
+ * @returns status badge
+ */
+const printStatus = (status: 'start' | 'success' | 'failed') => {
+    let badge = '';
+    switch (status) {
+        case 'start':
+            badge = 'EXEC';
+            break;
+        case 'failed':
+            badge = `${BASH_COLOR.RED_BG}FAIL`;
+            break;
+        default:
+            badge = 'DONE';
+    }
+    return `${badge}${BASH_COLOR.RESET}`;
+};
+
+/**
  * Writes the log information directly to stdout
  * @param actor THe actor who triggered an executable
  * @param element The executable
  */
-const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable): void => {
+const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable, status: 'start' | 'success' | 'failed'): string | undefined => {
     if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
-        return;
+        return undefined;
     }
 
     const isQuestion = element instanceof Question;
 
     const msg = `${
-        isQuestion ? '✔️' : '↪'
+        status !== 'failed' ? (isQuestion ? '✔️' : '↪') : '✗'
     } ${
         actor.attributes.name
     } ${
@@ -70,7 +89,11 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         printCallStack(element.callStack)
     }`;
 
-    process.stdout.write(`${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}${BASH_COLOR.RESET} ${blankifyMsg(msg, indentationLevel)}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}\n`);
+    const color = status === 'failed' ? BASH_COLOR.RED : BASH_COLOR.RESET;
+    const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}`;
+
+    process.stdout.write(`${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}  ${printStatus(status)}${color} ${blankifyMsg(msgActivityAndFile, indentationLevel)}\n`);
+    return msgActivityAndFile;
 };
 
 export default log;
