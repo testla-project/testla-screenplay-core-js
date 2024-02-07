@@ -3,6 +3,8 @@ export const LOGGING_IDENTIFIER = 'testla:sp';
 export const BASH_COLOR = {
     GRAY: '\x1B[90m',
     BLUE: '\x1B[94m',
+    RED: '\x1B[31m',
+    RED_BG: '\x1B[41m',
     RESET: '\x1B[0m',
 };
 

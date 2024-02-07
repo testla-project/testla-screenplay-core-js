@@ -82,19 +82,27 @@ export class Actor implements IActor {
     public async attemptsTo(...activities: (ITask | IAction)[]): Promise<any> {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, activity: (ITask | IAction) & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
-            log(this, activity);
+            try {
+                log(this, activity, 'start');
+                if (activity instanceof Task) {
+                    indentationLevelUp();
+                }
 
-            if (activity instanceof Task) {
-                indentationLevelUp();
+                const innerRes = await activity.performAs(this);
+
+                if (activity instanceof Task) {
+                    indentationLevelDown();
+                }
+
+                log(this, activity, 'success');
+                return Promise.resolve(innerRes);
+            } catch (err) {
+                if (activity instanceof Task) {
+                    indentationLevelDown();
+                }
+                log(this, activity, 'failed');
+                throw (err);
             }
-
-            const innerRes = await activity.performAs(this);
-
-            if (activity instanceof Task) {
-                indentationLevelDown();
-            }
-
-            return Promise.resolve(innerRes);
         });
         const attempsRes = await activities.reduce(reducefn, Promise.resolve());
         return Promise.resolve(attempsRes);
@@ -121,10 +129,15 @@ export class Actor implements IActor {
     public async asks<T>(...questions: (IQuestion<T> & ILogable)[]): Promise<T> {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, question: IQuestion<T> & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
-            log(this, question);
-
-            const innerRes = await question.answeredBy(this);
-            return Promise.resolve(innerRes);
+            try {
+                log(this, question, 'start');
+                const innerRes = await question.answeredBy(this);
+                log(this, question, 'success');
+                return Promise.resolve(innerRes);
+            } catch (err) {
+                log(this, question, 'failed');
+                throw (err);
+            }
         });
         const attempsRes = await questions.reduce(reducefn, Promise.resolve());
         return Promise.resolve(attempsRes);
