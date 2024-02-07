@@ -24,9 +24,11 @@ Core already out of the box provides information to the logger which include:
 
 ![Screenplay Pattern](./assets/logging/logging_core_explained.png)
 
+* Activity status (exec, done or fail)
 * Actor name
 * Type of interaction (attemptsTo or asks)
 * Action, Task or Question name
+* Indentation for Actions and Sub-Tasks inside a Task
 * Initializer method name (without parameters during initialization)
 * Ability aliasing
 * UTC timestamp of the execution
