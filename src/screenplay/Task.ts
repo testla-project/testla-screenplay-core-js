@@ -5,6 +5,8 @@ import { UsingAlias } from '../templates/UsingAlias';
  * Tasks can be triggered by calling them from an actor object.
  */
 export abstract class Task extends UsingAlias implements ITask, ILogable {
+    public canSkipOnFailure = false;
+
     /**
      *  Makes the provided {@link IActor}
      *  perform this Task.
@@ -17,4 +19,13 @@ export abstract class Task extends UsingAlias implements ITask, ILogable {
      * @override This method will have to be overridden wit hthe actual integration of an action.
      */
     abstract performAs(actor: IActor): Promise<any>
+
+    /**
+     * makes the step pass even if an error is thrown
+     */
+    public get orSkipOnFail() {
+        this.canSkipOnFailure = true;
+        this.addToCallStack({ caller: 'orSkipOnFail' });
+        return this;
+    }
 }

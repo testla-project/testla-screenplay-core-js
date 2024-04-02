@@ -9,6 +9,21 @@ import { Question } from '../screenplay/Question';
 import { printCallStack, printFilePath } from './call-stack';
 
 /**
+ * skipOnFail mode sets color to regular color instead of red on logging
+ */
+let skipOnFailLevel = 0;
+
+/**
+ * Highers the skipOnFailLevel level
+ */
+export const skipOnFailLevelUp = (): void => { skipOnFailLevel += 1; };
+
+/**
+ * Lowers the skipOnFailLevel level
+ */
+export const skipOnFailLevelDown = (): void => { skipOnFailLevel -= 1; };
+
+/**
  * Current indentation level
  */
 let indentationLevel = 0;
@@ -50,14 +65,17 @@ const printCurrentTime = () => (new Date())
  * @param status of the activity
  * @returns status badge
  */
-const printStatus = (status: 'start' | 'success' | 'failed') => {
+const printStatus = (status: 'start' | 'success' | 'failed' | 'skipped') => {
     let badge = '';
     switch (status) {
         case 'start':
             badge = 'EXEC';
             break;
         case 'failed':
-            badge = `${BASH_COLOR.RED_BG}FAIL`;
+            badge = `${skipOnFailLevel === 0 ? BASH_COLOR.RED_BG : ''}FAIL`;
+            break;
+        case 'skipped':
+            badge = 'SKIP';
             break;
         default:
             badge = 'DONE';
@@ -70,7 +88,7 @@ const printStatus = (status: 'start' | 'success' | 'failed') => {
  * @param actor THe actor who triggered an executable
  * @param element The executable
  */
-const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable, status: 'start' | 'success' | 'failed'): string | undefined => {
+const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable, status: 'start' | 'success' | 'failed' | 'skipped'): string | undefined => {
     if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
         return undefined;
     }
@@ -89,7 +107,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         printCallStack(element.callStack)
     }`;
 
-    const color = status === 'failed' ? BASH_COLOR.RED : BASH_COLOR.RESET;
+    const color = status === 'failed' && skipOnFailLevel === 0 ? BASH_COLOR.RED : BASH_COLOR.RESET;
     const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}`;
 
     process.stdout.write(`${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}  ${printStatus(status)}${color} ${blankifyMsg(msgActivityAndFile, indentationLevel)}\n`);

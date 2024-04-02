@@ -1,7 +1,9 @@
 import {
     IActor, IAbility, IAction, IQuestion, ITask, ILogable,
 } from '../interfaces';
-import log, { indentationLevelDown, indentationLevelUp } from '../utils/logger';
+import log, {
+    indentationLevelDown, indentationLevelUp, skipOnFailLevelUp, skipOnFailLevelDown,
+} from '../utils/logger';
 import { Task } from './Task';
 
 /**
@@ -83,24 +85,50 @@ export class Actor implements IActor {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, activity: (ITask | IAction) & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
             try {
+                if (activity.canSkipOnFailure) {
+                    skipOnFailLevelUp();
+                }
                 log(this, activity, 'start');
                 if (activity instanceof Task) {
                     indentationLevelUp();
                 }
 
-                const innerRes = await activity.performAs(this);
+                let innerRes;
+                let skipped = false;
+
+                try {
+                    innerRes = await activity.performAs(this);
+                } catch (e) {
+                    // eslint-disable-next-line
+                    if (activity.canSkipOnFailure) {
+                        // log(this, activity, 'skipped');
+                        // return Promise.resolve();
+                        skipped = true;
+                    } else {
+                        throw e;
+                    }
+                }
 
                 if (activity instanceof Task) {
                     indentationLevelDown();
                 }
 
-                log(this, activity, 'success');
+                if (skipped) {
+                    log(this, activity, 'failed');
+                }
+                log(this, activity, skipped ? 'skipped' : 'success');
+                if (activity.canSkipOnFailure) {
+                    skipOnFailLevelDown();
+                }
                 return Promise.resolve(innerRes);
             } catch (err) {
                 if (activity instanceof Task) {
                     indentationLevelDown();
                 }
                 log(this, activity, 'failed');
+                if (activity.canSkipOnFailure) {
+                    skipOnFailLevelDown();
+                }
                 throw (err);
             }
         });

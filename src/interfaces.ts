@@ -47,6 +47,8 @@ export interface IAbility {
  * An object representing an action that an {@link IActor} can perform.
  */
 export interface IAction {
+    canSkipOnFailure: boolean;
+
     /**
      *  Makes the provided {@link IActor}
      *  perform this Action.
@@ -63,6 +65,8 @@ export interface IAction {
  * An object representing a task that an {@link IActor} can perform.
  */
 export interface ITask {
+    canSkipOnFailure: boolean;
+
     /**
      *  Makes the provided {@link IActor}
      *  perform this Task.
