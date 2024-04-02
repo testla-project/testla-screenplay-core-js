@@ -1,3 +1,5 @@
+import { EXEC_STATUS } from './constants';
+
 export interface IActor {
     // collection of attributes assigned to the actor
     attributes: { [key: string]: any };
@@ -87,3 +89,5 @@ export interface IQuestion<T> {
      */
     answeredBy(actor: IActor): Promise<T>;
 }
+
+export type ExecStatus = EXEC_STATUS;

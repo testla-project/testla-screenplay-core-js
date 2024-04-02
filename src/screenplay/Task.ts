@@ -5,6 +5,9 @@ import { UsingAlias } from '../templates/UsingAlias';
  * Tasks can be triggered by calling them from an actor object.
  */
 export abstract class Task extends UsingAlias implements ITask, ILogable {
+    /**
+     * Determines if the step can be skipped on failure
+     */
     public canSkipOnFailure = false;
 
     /**

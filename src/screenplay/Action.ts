@@ -7,6 +7,9 @@ import { UsingAlias } from '../templates/UsingAlias';
  * Actions can be triggered by calling them from an actor object.
  */
 export abstract class Action extends UsingAlias implements IAction, ILogable {
+    /**
+     * Determines if the step can be skipped on failure
+     */
     public canSkipOnFailure = false;
 
     /**

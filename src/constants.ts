@@ -12,3 +12,10 @@ export const BASH_COLOR = {
 export const LOGGING_BASE_INDENTATION = '  ';
 
 export const LOGGING_BLANKS_PER_INDENTATION_LEVEL = 4;
+
+export enum EXEC_STATUS {
+    'START',
+    'SUCCESS',
+    'FAILED',
+    'SKIPPED'
+}

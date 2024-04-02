@@ -227,7 +227,7 @@ test.describe('My Test', () => {
 
 ### Proceeding with the test when an action/task fails
 
-YOu may have actions or tasks which might (expectedly) fail during the test. An example is to click an element if it is present while it is also fine to proceed with the test when the element is not visible.
+You may have actions or tasks which might (expectedly) fail during the test. An example is to click an element if it is present while it is also fine to proceed with the test when the element is not available.
 
 This can be achieved as follows:
 
