@@ -130,4 +130,14 @@ describe('Testing the core', () => {
         await TestActor.asks(SampleQuestion.toHave.payload('test'));
         await TestActor.asks(SampleQuestion.toHave.payload('test with alias').withAbilityAlias('test alias'));
     });
+
+    test('Try using an action and task without actor having the corresponding ability assigned but pass because of skipOnFail', async () => {
+        const TestActor = Actor.named('Test Actor');
+
+        await TestActor.attemptsTo(
+            UtilizeAction.getAbilityPayload().orSkipOnFail,
+            WrapperTask.execute().orSkipOnFail,
+            WrapperTask.execute().canSkipInnerAction,
+        );
+    });
 });

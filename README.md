@@ -225,6 +225,20 @@ test.describe('My Test', () => {
 });
 ```
 
+### Proceeding with the test when an action/task fails
+
+You may have actions or tasks which might (expectedly) fail during the test. An example is to click an element if it is present while it is also fine to proceed with the test when the element is not available.
+
+This can be achieved as follows:
+
+```javascript
+await actor.attemptsTo(
+    // this action might fail but the test will continue
+    Click.on('#eventually-available').orSkipOnFail,
+    Click.on('#definitely-available'),
+);
+```
+
 ### Detailed explaination of the internal call flow
 
 To understand the internal component call flow better please refer to the [flow guide](./doc/flows.md). This guide also provides detailed information about how to use aliases for abilities.

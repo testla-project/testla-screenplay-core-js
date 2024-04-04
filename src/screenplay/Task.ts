@@ -6,6 +6,11 @@ import { UsingAlias } from '../templates/UsingAlias';
  */
 export abstract class Task extends UsingAlias implements ITask, ILogable {
     /**
+     * Determines if the step can be skipped on failure
+     */
+    public canSkipOnFailure = false;
+
+    /**
      *  Makes the provided {@link IActor}
      *  perform this Task.
      *
@@ -17,4 +22,13 @@ export abstract class Task extends UsingAlias implements ITask, ILogable {
      * @override This method will have to be overridden wit hthe actual integration of an action.
      */
     abstract performAs(actor: IActor): Promise<any>
+
+    /**
+     * makes the step pass even if an error is thrown
+     */
+    public get orSkipOnFail() {
+        this.canSkipOnFailure = true;
+        this.addToCallStack({ caller: 'orSkipOnFail' });
+        return this;
+    }
 }

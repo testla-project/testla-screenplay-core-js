@@ -7,10 +7,16 @@ export class WrapperTask extends Task {
         UtilizeAction.getAbilityPayload(),
     ];
 
+    private actionSkipable = false;
+
     // eslint-disable-next-line class-methods-use-this
     public async performAs(actor: Actor): Promise<any> {
         // provide the ability alias to all activities
-        this.activities.forEach((activity) => {
+        this.activities.forEach((activity: Task | Action) => {
+            if (this.actionSkipable) {
+                // eslint-disable-next-line
+                activity.orSkipOnFail;
+            }
             activity.withAbilityAlias(this.abilityAlias);
         });
 
@@ -23,5 +29,11 @@ export class WrapperTask extends Task {
         const instance = new WrapperTask();
         instance.setCallStackInitializeCalledWith({});
         return instance;
+    }
+
+    public get canSkipInnerAction(): WrapperTask {
+        this.actionSkipable = true;
+        this.addToCallStack({ caller: 'canSkipInnerAction' });
+        return this;
     }
 }
