@@ -10,7 +10,7 @@ export abstract class Action extends UsingAlias implements IAction, ILogable {
     /**
      * Determines if the step can be skipped on failure
      */
-    public canSkipOnFailure = false;
+    private canSkipOnFail = false;
 
     /**
      *  Makes the provided {@link IActor}
@@ -29,8 +29,16 @@ export abstract class Action extends UsingAlias implements IAction, ILogable {
      * makes the step pass even if an error is thrown
      */
     public get orSkipOnFail() {
-        this.canSkipOnFailure = true;
+        this.canSkipOnFail = true;
         this.addToCallStack({ caller: 'orSkipOnFail' });
         return this;
+    }
+
+    /**
+     * Returns the orSkipOnFail state
+     * @returns if orSkipOnFail is set
+     */
+    public getCanSkipOnFail() {
+        return this.canSkipOnFail;
     }
 }

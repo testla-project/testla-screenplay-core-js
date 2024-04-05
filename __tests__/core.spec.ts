@@ -140,4 +140,19 @@ describe('Testing the core', () => {
             WrapperTask.execute().canSkipInnerAction,
         );
     });
+
+    test('Question to fail as boolean false instead of throwing error', async () => {
+        const TestActor = Actor.named('Test Actor')
+            .can(UseAbility.using('test'));
+        const shallBeTrue = await TestActor.asks(
+            SampleQuestion.toHave.payload('test'),
+        );
+
+        const shallBeFalse = await TestActor.asks(
+            SampleQuestion.toHave.payload('test1').failAsFalse,
+        );
+
+        expect(shallBeTrue).toBe(true);
+        expect(shallBeFalse).toBe(false);
+    });
 });

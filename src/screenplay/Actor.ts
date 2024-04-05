@@ -86,7 +86,7 @@ export class Actor implements IActor {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, activity: (ITask | IAction) & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
             try {
-                if (activity.canSkipOnFailure) {
+                if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelUp();
                 }
                 log(this, activity, EXEC_STATUS.START);
@@ -101,7 +101,7 @@ export class Actor implements IActor {
                     innerRes = await activity.performAs(this);
                 } catch (e) {
                     // eslint-disable-next-line
-                    if (activity.canSkipOnFailure) {
+                    if (activity.getCanSkipOnFail()) {
                         // log(this, activity, 'skipped');
                         // return Promise.resolve();
                         skipped = true;
@@ -118,7 +118,7 @@ export class Actor implements IActor {
                     log(this, activity, EXEC_STATUS.FAILED);
                 }
                 log(this, activity, skipped ? EXEC_STATUS.SKIPPED : EXEC_STATUS.SUCCESS);
-                if (activity.canSkipOnFailure) {
+                if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelDown();
                 }
                 return Promise.resolve(innerRes);
@@ -127,7 +127,7 @@ export class Actor implements IActor {
                     indentationLevelDown();
                 }
                 log(this, activity, EXEC_STATUS.FAILED);
-                if (activity.canSkipOnFailure) {
+                if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelDown();
                 }
                 throw (err);
@@ -164,6 +164,11 @@ export class Actor implements IActor {
                 log(this, question, EXEC_STATUS.SUCCESS);
                 return Promise.resolve(innerRes);
             } catch (err) {
+                if (question.getIsFailAsFalse()) {
+                    log(this, question, EXEC_STATUS.SUCCESS);
+                    return Promise.resolve(false);
+                }
+
                 log(this, question, EXEC_STATUS.FAILED);
                 throw (err);
             }

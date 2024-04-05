@@ -49,8 +49,6 @@ export interface IAbility {
  * An object representing an action that an {@link IActor} can perform.
  */
 export interface IAction {
-    canSkipOnFailure: boolean;
-
     /**
      *  Makes the provided {@link IActor}
      *  perform this Action.
@@ -61,14 +59,18 @@ export interface IAction {
      * @see {@link IActor}
      */
     performAs(actor: IActor): Promise<any>;
+
+    /**
+     * Returns the failAsFalse state
+     * @returns if failAsFalse is set
+     */
+    getCanSkipOnFail(): boolean;
 }
 
 /**
  * An object representing a task that an {@link IActor} can perform.
  */
 export interface ITask {
-    canSkipOnFailure: boolean;
-
     /**
      *  Makes the provided {@link IActor}
      *  perform this Task.
@@ -79,6 +81,12 @@ export interface ITask {
      * @see {@link IActor}
      */
     performAs(actor: IActor): Promise<any>;
+
+    /**
+     * Returns the failAsFalse state
+     * @returns if failAsFalse is set
+     */
+    getCanSkipOnFail(): boolean;
 }
 
 export interface IQuestion<T> {
@@ -88,6 +96,12 @@ export interface IQuestion<T> {
      * @param {IActor} actor the actor that queries.
      */
     answeredBy(actor: IActor): Promise<T>;
+
+    /**
+     * Returns the failAsFalse state
+     * @returns if failAsFalse is set
+     */
+    getIsFailAsFalse(): boolean;
 }
 
 export type ExecStatus = EXEC_STATUS;
