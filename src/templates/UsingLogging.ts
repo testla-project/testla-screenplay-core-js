@@ -3,7 +3,7 @@ import { CallStackCalledWith, CallStackInfo } from '../interfaces';
 import { identifyCaller } from '../utils/call-stack';
 
 export class UsingLogging {
-    callStack?: CallStackInfo[];
+    private callStack?: CallStackInfo[];
 
     constructor() {
         if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
@@ -23,5 +23,9 @@ export class UsingLogging {
         if (this.callStack) {
             this.callStack.push(entry);
         }
+    }
+
+    getCallStack() {
+        return this.callStack;
     }
 }

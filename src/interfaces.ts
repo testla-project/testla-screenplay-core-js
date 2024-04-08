@@ -33,7 +33,7 @@ export type CallStackInfo = {
 };
 
 export interface ILogable {
-    callStack?: CallStackInfo[];
+    getCallStack?(): CallStackInfo[] | undefined;
 }
 
 export interface IAbility {

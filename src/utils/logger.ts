@@ -104,11 +104,11 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
     } ${
         element.constructor.name
     }${
-        printCallStack(element.callStack)
+        printCallStack(element.getCallStack?.())
     }`;
 
     const color = status === EXEC_STATUS.FAILED && skipOnFailLevel === 0 ? BASH_COLOR.RED : BASH_COLOR.RESET;
-    const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}${printFilePath(element.callStack)}${BASH_COLOR.RESET}`;
+    const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}${printFilePath(element.getCallStack?.())}${BASH_COLOR.RESET}`;
 
     process.stdout.write(`${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${printCurrentTime()}  ${printStatus(status)}${color} ${blankifyMsg(msgActivityAndFile, indentationLevel)}\n`);
     return msgActivityAndFile;
