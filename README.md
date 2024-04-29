@@ -239,6 +239,22 @@ await actor.attemptsTo(
 );
 ```
 
+### Use failing questions for test flow conrols
+
+In some cases you may want to ask questions to find out about the status opf the system under test to make decisions on how to move on with your test. In order to not fail a test but receive information about questions being answered negative you can use `failAsFalse` on a question which then returns a boolean value instead.
+
+```javascript
+// find out if question was answered with false
+const wasLoggedIn = await actors.asks(
+    Login.toBe.successful().failAsFalse,
+);
+
+// proceed based on answer from above
+if (wasLoggedIn === false) {
+    // some code to be axecuted on false case
+}
+```
+
 ### Detailed explaination of the internal call flow
 
 To understand the internal component call flow better please refer to the [flow guide](./doc/flows.md). This guide also provides detailed information about how to use aliases for abilities.
