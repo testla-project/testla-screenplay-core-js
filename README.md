@@ -239,9 +239,9 @@ await actor.attemptsTo(
 );
 ```
 
-### Use failing questions for test flow conrols
+### Use failing questions for test flow controls
 
-In some cases you may want to ask questions to find out about the status opf the system under test to make decisions on how to move on with your test. In order to not fail a test but receive information about questions being answered negative you can use `failAsFalse` on a question which then returns a boolean value instead.
+In some cases you may want to ask questions to find out about the status of the system under test to make decisions on how to move on with your test. In order to not fail a test but receive information about questions being answered negative you can use `failAsFalse` on a question which then returns a boolean value instead.
 
 ```javascript
 // find out if question was answered with false
@@ -251,7 +251,7 @@ const wasLoggedIn = await actors.asks(
 
 // proceed based on answer from above
 if (wasLoggedIn === false) {
-    // some code to be axecuted on false case
+    // some code to be executed on false case
 }
 ```
 
