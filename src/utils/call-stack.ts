@@ -66,11 +66,11 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
 };
 
 /**
- * Prints the filename without path
+ * Gets the filename without path
  * @param callStack the callstack information
  * @returns string
  */
-export const printFilePath = (callStack?: CallStackInfo[]): string => {
+export const getFilePath = (callStack?: CallStackInfo[]): string => {
     if (callStack && callStack[0]?.file) {
         return `(${callStack[0].file.split('/').slice(-1)})`;
     }

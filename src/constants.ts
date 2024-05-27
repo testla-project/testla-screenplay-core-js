@@ -19,3 +19,9 @@ export enum EXEC_STATUS {
     'FAILED',
     'SKIPPED'
 }
+
+export enum ACTIVITY_TYPE {
+    'ACTION',
+    'TASK',
+    'QUESTION'
+}
