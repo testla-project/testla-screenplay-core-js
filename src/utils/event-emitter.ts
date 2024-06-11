@@ -1,7 +1,19 @@
 import EventEmitter from 'node:events';
 
-class TestlaScreenplayEmitter extends EventEmitter {}
+class TestlaScreenplayEventEmitter extends EventEmitter {}
 
-const testlaScreenplayEventEmitter = new TestlaScreenplayEmitter();
+// const testlaScreenplayEventEmitter = new TestlaScreenplayEventEmitter();
 
-export default testlaScreenplayEventEmitter;
+// register the emitter globally
+// eslint-disable-next-line
+// @ts-ignore
+if (!global.testlaScreenplayEventEmitter) {
+    // eslint-disable-next-line
+    // @ts-ignore
+    global.testlaScreenplayEventEmitter = new TestlaScreenplayEventEmitter();
+}
+
+// eslint-disable-next-line
+// @ts-ignore
+export default global.testlaScreenplayEventEmitter;
+// export default testlaScreenplayEventEmitter;
