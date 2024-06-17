@@ -102,8 +102,6 @@ export class Actor implements IActor {
                 } catch (e) {
                     // eslint-disable-next-line
                     if (activity.getCanSkipOnFail()) {
-                        // log(this, activity, 'skipped');
-                        // return Promise.resolve();
                         skipped = true;
                     } else {
                         throw e;

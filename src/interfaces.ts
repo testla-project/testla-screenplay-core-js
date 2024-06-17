@@ -1,4 +1,4 @@
-import { EXEC_STATUS } from './constants';
+import { EXEC_STATUS, ACTIVITY_TYPE } from './constants';
 
 export interface IActor {
     // collection of attributes assigned to the actor
@@ -105,3 +105,17 @@ export interface IQuestion<T> {
 }
 
 export type ExecStatus = EXEC_STATUS;
+
+export type ActivityType = ACTIVITY_TYPE;
+
+export type LogEvent = {
+    activityType: ActivityType;
+    activityAction: string;
+    activityDetails: string;
+    status: ExecStatus;
+    actor: string;
+    filePath: string;
+    skipOnFailLevel: number;
+    wrapLevel: number;
+    time: Date;
+};

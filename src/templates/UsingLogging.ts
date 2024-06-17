@@ -1,4 +1,4 @@
-import { LOGGING_IDENTIFIER } from '../constants';
+import { LOGGING_IDENTIFIER, STRUCTURED_LOGS_ENVVAR_NAME } from '../constants';
 import { CallStackCalledWith, CallStackInfo } from '../interfaces';
 import { identifyCaller } from '../utils/call-stack';
 
@@ -6,7 +6,12 @@ export class UsingLogging {
     private callStack?: CallStackInfo[];
 
     constructor() {
-        if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
+        if (
+            // regular formatted console debug logs
+            !process.env.DEBUG?.includes(LOGGING_IDENTIFIER)
+            // structured logs to be caught for parsing i.e. for playewright reporter
+            && process.env[STRUCTURED_LOGS_ENVVAR_NAME] !== 'true'
+        ) {
             return;
         }
 

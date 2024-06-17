@@ -2,6 +2,8 @@
 
 # Logging
 
+## Human readable logs to stdout
+
 Testla comes with logging which helps you to debug your test code. When logging is enabled all activities an actor triggers are logged in a comprehensive way to stdout. To enable logging set the DEBUG environment variable as follows:
 
 ```typescript
@@ -80,6 +82,46 @@ public withAbilityAlias(alias: string | undefined) {
 }
 ```
 
-`addToCallStack` awaits an object usually with the attributes `caller`and `calledWith` while `caller` determines the method name and `calledWith` the paramaters of the method when called. 
+`addToCallStack` awaits an object usually with the attributes `caller`and `calledWith` while `caller` determines the method name and `calledWith` the paramaters of the method when called.
+
+## Creating a custom logger
+
+> Introduced in: 1.1.0
+>
+> This feature is currently in experimental stage and might see bigger changes.
+
+Logging is internally build on events. To establish an own logging solution you just have to listen to the log events.
+
+```typescript
+import { testlaScreenplayEventEmitter, LogEvent } from '@tesla/screenplay';
+
+testlaScreenplayEventEmitter.on('logEvent', (event: LogEvent) => {
+    // custom implementation
+});
+```
+
+In some cases it is not possible to listen to the event emitter i.e. with a setup of main and worker proesses - an example for that is playwright. For these cases testla can write structured log events to stdout which can be parsed by your custom integration.
+
+```typescript
+import { STRUCTURED_LOGS_ENVVAR_NAME } from '@testla/screenplay'
+
+// activating structured logs to stdout
+process.env[STRUCTURED_LOGS_ENVVAR_NAME] = 'true';
+```
+
+Stdout can be observed now and a log line can be parsed as follows.
+
+```typescript
+import { checkIfLogEvent, parseLogEvent, LogEvent } from '@testla/screenplay'
+
+// check if log line is a valid testla strucured log
+if (checkIfLogEvent(line)) {
+    // parsing the log line
+    const logEvent: LogEvent = parseLogEvent(line);
+    // custom implementation comes here
+}
+```
+
+With that you have the access to the same information/event as if it was emitted by the event emitter. 
 
 [Back to Overview](../README.md)
