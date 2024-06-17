@@ -56,7 +56,7 @@ export const printLogEventToStdout = (event: LogEvent, raw = false): void => {
         log = `${stringifyLogEvent(event)}\n`;
     } else {
         const {
-            activityType, status, actor, activityText, activity,
+            activityType, status, actor, activityDetails, activityAction,
             skipOnFailLevel, wrapLevel, filePath, time,
         } = event;
         const isQuestion = activityType === ACTIVITY_TYPE.QUESTION;
@@ -66,13 +66,13 @@ export const printLogEventToStdout = (event: LogEvent, raw = false): void => {
         } ${
             actor
         } ${
-            activity
+            activityAction
         } ${
-            activityText
+            activityDetails
         }`;
 
         const color = status === EXEC_STATUS.FAILED && skipOnFailLevel === 0 ? BASH_COLOR.RED : BASH_COLOR.RESET;
-        const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}${filePath}${BASH_COLOR.RESET}`;
+        const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}(${filePath})${BASH_COLOR.RESET}`;
         log = `${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${getCurrentTime(time)}  ${getStatusText(status, skipOnFailLevel)}${color} ${blankifyMsg(msgActivityAndFile, wrapLevel)}\n`;
     }
 

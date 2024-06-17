@@ -110,8 +110,8 @@ export type ActivityType = ACTIVITY_TYPE;
 
 export type LogEvent = {
     activityType: ActivityType;
-    activity: string;
-    activityText: string;
+    activityAction: string;
+    activityDetails: string;
     status: ExecStatus;
     actor: string;
     filePath: string;

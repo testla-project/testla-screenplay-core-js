@@ -72,7 +72,8 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
  */
 export const getFilePath = (callStack?: CallStackInfo[]): string => {
     if (callStack && callStack[0]?.file) {
-        return `(${callStack[0].file.split('/').slice(-1)})`;
+        const path = `${callStack[0].file.split('/').slice(-1)}`;
+        return path.replaceAll(/[()]/ig, '')
     }
     return '';
 };

@@ -58,8 +58,8 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
     const activityType = identifyActivityType(element);
     const evt: LogEvent = {
         activityType,
-        activity: activityType === ACTIVITY_TYPE.QUESTION ? 'asks' : 'attemptsTo',
-        activityText: `${
+        activityAction: activityType === ACTIVITY_TYPE.QUESTION ? 'asks' : 'attemptsTo',
+        activityDetails: `${
             element.constructor.name
         }${
             printCallStack(element.getCallStack?.())

@@ -14,14 +14,14 @@ export const LOGGING_BASE_INDENTATION = '  ';
 export const LOGGING_BLANKS_PER_INDENTATION_LEVEL = 4;
 
 export enum EXEC_STATUS {
-    'START',
-    'SUCCESS',
-    'FAILED',
-    'SKIPPED'
+    'START' = 'start',
+    'SUCCESS' = 'success',
+    'FAILED' = 'failed',
+    'SKIPPED' = 'skipped'
 }
 
 export enum ACTIVITY_TYPE {
-    'ACTION',
-    'TASK',
-    'QUESTION'
+    'ACTION' = 'action',
+    'TASK' = 'task',
+    'QUESTION' = 'question'
 }

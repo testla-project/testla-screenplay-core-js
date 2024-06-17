@@ -6,7 +6,12 @@ export class UsingLogging {
     private callStack?: CallStackInfo[];
 
     constructor() {
-        if (!process.env.DEBUG?.includes(LOGGING_IDENTIFIER)) {
+        if (
+            // regular formatted console debug logs
+            !process.env.DEBUG?.includes(LOGGING_IDENTIFIER)
+            // structured logs to be caught for parsing i.e. for playewright reporter
+            && process.env.TEASLA_SCREENPLAY_STRUCTURED_LOGS !== 'true'
+        ) {
             return;
         }
 
