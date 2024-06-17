@@ -1,5 +1,7 @@
 export const LOGGING_IDENTIFIER = 'testla:sp';
 
+export const STRUCTURED_LOGS_ENVVAR_NAME = 'TEASLA_SCREENPLAY_STRUCTURED_LOGS';
+
 export const BASH_COLOR = {
     GRAY: '\x1B[90m',
     BLUE: '\x1B[94m',
