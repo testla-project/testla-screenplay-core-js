@@ -86,6 +86,10 @@ public withAbilityAlias(alias: string | undefined) {
 
 ## Creating a custom logger
 
+> Introduced in: 1.1.0
+>
+> This feature is currently in experimental stage and might see bigger changes.
+
 Logging is internally build on events. To establish an own logging solution you just have to listen to the log events.
 
 ```typescript
