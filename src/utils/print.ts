@@ -1,7 +1,8 @@
 import {
-    ACTIVITY_TYPE, BASH_COLOR, EXEC_STATUS, LOGGING_BASE_INDENTATION, LOGGING_BLANKS_PER_INDENTATION_LEVEL,
+    BASH_COLOR, EXEC_STATUS, LOGGING_BASE_INDENTATION, LOGGING_BLANKS_PER_INDENTATION_LEVEL,
+    LOGGING_STATUS_TEXT_ICON,
 } from '../constants';
-import { ExecStatus, LogEvent } from '../interfaces';
+import { ActivityDetail, ExecStatus, LogEvent } from '../interfaces';
 import { stringifyLogEvent } from './event';
 
 /**
@@ -31,23 +32,56 @@ const getCurrentTime = (date: Date) => date
  * @param status of the activity
  * @returns status badge
  */
-const getStatusText = (status: ExecStatus, skipOnFailLevel: number) => {
+export const getStatusText = (status: ExecStatus) => {
     let badge = '';
     switch (status) {
         case EXEC_STATUS.START:
             badge = 'EXEC';
             break;
-        case EXEC_STATUS.FAILED:
-            badge = `${skipOnFailLevel === 0 ? BASH_COLOR.RED_BG : ''}FAIL`;
-            break;
         case EXEC_STATUS.SKIPPED:
             badge = 'SKIP';
             break;
-        default:
+        case EXEC_STATUS.SUCCESS:
             badge = 'DONE';
+            break;
+        case EXEC_STATUS.FAILED:
+        default:
+            badge = 'FAIL';
     }
-    return `${badge}${BASH_COLOR.RESET}`;
+    return badge;
 };
+
+/**
+ * @param status of the activity
+ * @returns status text icon
+ */
+export const getStatusIcon = (status: string): string => {
+    switch (status) {
+        case EXEC_STATUS.SKIPPED:
+            return LOGGING_STATUS_TEXT_ICON.SKIP;
+        case EXEC_STATUS.START:
+            return LOGGING_STATUS_TEXT_ICON.EXEC;
+        case EXEC_STATUS.SUCCESS:
+            return LOGGING_STATUS_TEXT_ICON.PASS;
+        case EXEC_STATUS.FAILED:
+        default:
+            return LOGGING_STATUS_TEXT_ICON.FAIL;
+    }
+};
+
+export const activityDetailsToString = (details: ActivityDetail[]) => details.map((detail) => {
+    let detailString = detail.methodName;
+    if (detail.parameters) {
+        const paramList: string[] = [];
+        Object.entries(detail.parameters || {}).forEach(([, value]) => {
+            paramList.push(
+                typeof value === 'string' ? `"${value}"` : `${value}`,
+            );
+        });
+        detailString += `(${paramList.join(', ')})`;
+    }
+    return detailString;
+}).join('.');
 
 export const printLogEventToStdout = (event: LogEvent, raw = false): void => {
     let log: string;
@@ -56,24 +90,45 @@ export const printLogEventToStdout = (event: LogEvent, raw = false): void => {
         log = `${stringifyLogEvent(event)}\n`;
     } else {
         const {
-            activityType, status, actor, activityDetails, activityAction,
-            skipOnFailLevel, wrapLevel, filePath, time,
+            status, actor, activityDetails, activityAction,
+            skipOnFailLevel, wrapLevel, location, time,
         } = event;
-        const isQuestion = activityType === ACTIVITY_TYPE.QUESTION;
+        const filePath = location ? `${location.file}:${location.line}` : '';
+        // const isQuestion = activityType === ACTIVITY_TYPE.QUESTION;
 
         const msg = `${
-            status !== EXEC_STATUS.FAILED ? (isQuestion ? '✔️' : '↪') : '✗'
+            // status !== EXEC_STATUS.FAILED ? (isQuestion ? '✔️' : '↪') : '✗'
+            getStatusIcon(status)
         } ${
             actor
         } ${
             activityAction
         } ${
-            activityDetails
+            activityDetailsToString(activityDetails)
         }`;
 
         const color = status === EXEC_STATUS.FAILED && skipOnFailLevel === 0 ? BASH_COLOR.RED : BASH_COLOR.RESET;
+        const statusTextBgColor = status === EXEC_STATUS.FAILED && skipOnFailLevel === 0 ? BASH_COLOR.RED_BG : '';
         const msgActivityAndFile = `${msg}  ${BASH_COLOR.GRAY}(${filePath})${BASH_COLOR.RESET}`;
-        log = `${LOGGING_BASE_INDENTATION}${BASH_COLOR.BLUE}testla:sp${BASH_COLOR.GRAY} ${getCurrentTime(time)}  ${getStatusText(status, skipOnFailLevel)}${color} ${blankifyMsg(msgActivityAndFile, wrapLevel)}\n`;
+        log = `${
+            LOGGING_BASE_INDENTATION
+        }${
+            BASH_COLOR.BLUE
+        }testla:sp${
+            BASH_COLOR.GRAY
+        } ${
+            getCurrentTime(time)
+        }  ${
+            statusTextBgColor
+        }${
+            getStatusText(status)
+        }${
+            BASH_COLOR.RESET
+        }${
+            color
+        } ${
+            blankifyMsg(msgActivityAndFile, wrapLevel)
+        }\n`;
     }
 
     process.stdout.write(log);

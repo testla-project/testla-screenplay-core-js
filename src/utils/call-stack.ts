@@ -1,4 +1,4 @@
-import { CallStackInfo } from '../interfaces';
+import { CallStackInfo, Location } from '../interfaces';
 
 const FILE_REGEX = /at (.+)/;
 const CALLER_REGEX_NON_QUESTION = /at Function.(.+) \(/;
@@ -55,8 +55,10 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
             info.calledWith ? '(' : ''
         }${
             Object.entries(info.calledWith || {})
-                .map(([key, value]) => `${key}: ${
-                    typeof value === 'string' ? `'${value}'` : value
+                .map(([, value]) => `${
+                    typeof value === 'object' || Array.isArray(value)
+                        ? JSON.stringify(value)
+                        : typeof value === 'string' ? `'${value}'` : value
                 }`)
                 .join(', ')
         }${
@@ -70,10 +72,44 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
  * @param callStack the callstack information
  * @returns string
  */
-export const getFilePath = (callStack?: CallStackInfo[]): string => {
+// export const getFilePath = (callStack?: CallStackInfo[]): string => {
+//     if (callStack && callStack[0]?.file) {
+//         const path = `${callStack[0].file.split(' ').slice(-1)}`;
+//         const cleanedPathArray = path
+//             .replaceAll(/[()]/ig, '')
+//             // show path relative to execution path
+//             .replace(process.cwd(), '.')
+//             .split(':');
+//         cleanedPathArray.pop();
+//         return cleanedPathArray.join(':');
+//     }
+//     return '';
+// };
+
+export const shortenFilePath = (filePath: string): string => filePath.replace(process.cwd(), '.');
+
+export const getFullFilePath = (potentiallyShortFilePath: string): string => (potentiallyShortFilePath.startsWith('./')
+    ? potentiallyShortFilePath.replace('./', `${process.cwd()}/`)
+    : potentiallyShortFilePath);
+
+/**
+ * Gets the location
+ * @param callStack the callstack information
+ * @returns Location
+ */
+export const getLocation = (callStack?: CallStackInfo[]): Location | undefined => {
     if (callStack && callStack[0]?.file) {
-        const path = `${callStack[0].file.split('/').slice(-1)}`;
-        return path.replaceAll(/[()]/ig, '');
+        const path = `${callStack[0].file.split(' ').slice(-1)}`;
+        // show path relative to execution path
+        const cleanedPathArray = shortenFilePath(
+            path
+                .replaceAll(/[()]/ig, ''),
+        )
+            .split(':');
+        return {
+            file: cleanedPathArray[0],
+            line: parseInt(cleanedPathArray[1], 10) || 0,
+            column: parseInt(cleanedPathArray[2], 10) || 0,
+        };
     }
-    return '';
 };
