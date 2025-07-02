@@ -122,11 +122,9 @@ export type Location = {
 export type LogEvent = {
     activityType: ActivityType;
     activityAction: string;
-    // activityDetails: string;
     activityDetails: ActivityDetail[];
     status: ExecStatus;
     actor: string;
-    // filePath: string;
     location?: Location;
     skipOnFailLevel: number;
     wrapLevel: number;

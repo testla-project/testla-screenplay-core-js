@@ -35,13 +35,13 @@ const getCurrentTime = (date: Date) => date
 export const getStatusText = (status: ExecStatus) => {
     let badge = '';
     switch (status) {
-        case EXEC_STATUS.START:
+        case EXEC_STATUS.STARTED:
             badge = 'EXEC';
             break;
         case EXEC_STATUS.SKIPPED:
             badge = 'SKIP';
             break;
-        case EXEC_STATUS.SUCCESS:
+        case EXEC_STATUS.PASSED:
             badge = 'DONE';
             break;
         case EXEC_STATUS.FAILED:
@@ -59,9 +59,9 @@ export const getStatusIcon = (status: string): string => {
     switch (status) {
         case EXEC_STATUS.SKIPPED:
             return LOGGING_STATUS_TEXT_ICON.SKIP;
-        case EXEC_STATUS.START:
+        case EXEC_STATUS.STARTED:
             return LOGGING_STATUS_TEXT_ICON.EXEC;
-        case EXEC_STATUS.SUCCESS:
+        case EXEC_STATUS.PASSED:
             return LOGGING_STATUS_TEXT_ICON.PASS;
         case EXEC_STATUS.FAILED:
         default:

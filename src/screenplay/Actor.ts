@@ -91,7 +91,7 @@ export class Actor implements IActor {
                 if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelUp();
                 }
-                log(this, activity, EXEC_STATUS.START, startTime);
+                log(this, activity, EXEC_STATUS.STARTED, startTime);
                 if (activity instanceof Task) {
                     indentationLevelUp();
                 }
@@ -119,7 +119,7 @@ export class Actor implements IActor {
                 if (skipped) {
                     log(this, activity, EXEC_STATUS.FAILED, endTime);
                 }
-                log(this, activity, skipped ? EXEC_STATUS.SKIPPED : EXEC_STATUS.SUCCESS, endTime);
+                log(this, activity, skipped ? EXEC_STATUS.SKIPPED : EXEC_STATUS.PASSED, endTime);
                 if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelDown();
                 }
@@ -163,15 +163,15 @@ export class Actor implements IActor {
         const reducefn = async (chain: Promise<any>, question: IQuestion<T> & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
             const startTime = new Date();
             try {
-                log(this, question, EXEC_STATUS.START, startTime);
+                log(this, question, EXEC_STATUS.STARTED, startTime);
                 const innerRes = await question.answeredBy(this);
                 const endTime = new Date();
-                log(this, question, EXEC_STATUS.SUCCESS, endTime);
+                log(this, question, EXEC_STATUS.PASSED, endTime);
                 return Promise.resolve(innerRes);
             } catch (err) {
                 const endTime = new Date();
                 if (question.getIsFailAsFalse()) {
-                    log(this, question, EXEC_STATUS.SUCCESS, endTime);
+                    log(this, question, EXEC_STATUS.PASSED, endTime);
                     return Promise.resolve(false);
                 }
 
