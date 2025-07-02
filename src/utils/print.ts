@@ -69,6 +69,11 @@ export const getStatusIcon = (status: string): string => {
     }
 };
 
+/**
+ * Turn activity details into a string representation
+ * @param details the activity details object
+ * @returns string representation of the activity details
+ */
 export const activityDetailsToString = (details: ActivityDetail[]) => details.map((detail) => {
     let detailString = detail.methodName;
     if (detail.parameters) {
@@ -83,6 +88,11 @@ export const activityDetailsToString = (details: ActivityDetail[]) => details.ma
     return detailString;
 }).join('.');
 
+/**
+ * Writes a log event to stdout either in raw format or formatted
+ * @param event the log event to print
+ * @param raw to determin if write logs in raw mode or string representation
+ */
 export const printLogEventToStdout = (event: LogEvent, raw = false): void => {
     let log: string;
 
@@ -94,10 +104,8 @@ export const printLogEventToStdout = (event: LogEvent, raw = false): void => {
             skipOnFailLevel, wrapLevel, location, time,
         } = event;
         const filePath = location ? `${location.file}:${location.line}` : '';
-        // const isQuestion = activityType === ACTIVITY_TYPE.QUESTION;
 
         const msg = `${
-            // status !== EXEC_STATUS.FAILED ? (isQuestion ? '✔️' : '↪') : '✗'
             getStatusIcon(status)
         } ${
             actor
