@@ -4,6 +4,11 @@ const FILE_REGEX = /at (.+)/;
 const CALLER_REGEX_NON_QUESTION = /at Function.(.+) \(/;
 const CALLER_REGEX_QUESTION = /at Function.get (.+) \[as/;
 
+/**
+ * Identifies the line number of the caller in the stack trace
+ * @param lines the stack lines
+ * @returns the line number of the caller or -1 if not found
+ */
 const identifyCallerLine = (lines?: string[]): number => {
     if (lines) {
         return lines.findIndex((line: string) => line.includes('at Function.'));
@@ -68,26 +73,17 @@ export const printCallStack = (callStack?: CallStackInfo[]): string => {
 };
 
 /**
- * Gets the filename without path
- * @param callStack the callstack information
- * @returns string
+ * Shortens the file path by translating it to the relative path to the execution directory
+ * @param filePath the file path to shorten
+ * @returns shortened filepath
  */
-// export const getFilePath = (callStack?: CallStackInfo[]): string => {
-//     if (callStack && callStack[0]?.file) {
-//         const path = `${callStack[0].file.split(' ').slice(-1)}`;
-//         const cleanedPathArray = path
-//             .replaceAll(/[()]/ig, '')
-//             // show path relative to execution path
-//             .replace(process.cwd(), '.')
-//             .split(':');
-//         cleanedPathArray.pop();
-//         return cleanedPathArray.join(':');
-//     }
-//     return '';
-// };
-
 export const shortenFilePath = (filePath: string): string => filePath.replace(process.cwd(), '.');
 
+/**
+ * Reverts a short filepath back to the full path
+ * @param potentiallyShortFilePath filepath
+ * @returns full filepath
+ */
 export const getFullFilePath = (potentiallyShortFilePath: string): string => (potentiallyShortFilePath.startsWith('./')
     ? potentiallyShortFilePath.replace('./', `${process.cwd()}/`)
     : potentiallyShortFilePath);
@@ -112,4 +108,5 @@ export const getLocation = (callStack?: CallStackInfo[]): Location | undefined =
             column: parseInt(cleanedPathArray[2], 10) || 0,
         };
     }
+    return undefined;
 };
