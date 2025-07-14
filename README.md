@@ -1,4 +1,7 @@
-# Testla
+<h1 style="display: flex; align-items: center;">
+  <img src="./doc/assets/testla-logo.png" alt="Testla Logo" style="height: 32px; margin-right: 10px;">
+  Testla
+</h1>
 
 ## Introduction
 
