@@ -5,7 +5,10 @@ import { Task } from './screenplay/Task';
 import { Question } from './screenplay/Question';
 import testlaScreenplayEventEmitter from './utils/event-emitter';
 import { LogEvent, ExecStatus } from './interfaces';
-import { printLogEventToStdout } from './utils/print';
+import {
+    printLogEventToStdout, activityDetailsToString, getStatusIcon, getStatusText,
+} from './utils/print';
+import { shortenFilePath, getFullFilePath } from './utils/call-stack';
 import {
     LOGGING_IDENTIFIER, ACTIVITY_TYPE, EXEC_STATUS, STRUCTURED_LOGS_ENVVAR_NAME,
 } from './constants';
@@ -13,7 +16,8 @@ import {
 export * from './utils/event';
 export {
     Actor, Ability, Action, Task, Question, testlaScreenplayEventEmitter,
-    ACTIVITY_TYPE, EXEC_STATUS, STRUCTURED_LOGS_ENVVAR_NAME,
+    ACTIVITY_TYPE, EXEC_STATUS, STRUCTURED_LOGS_ENVVAR_NAME, shortenFilePath,
+    getFullFilePath, activityDetailsToString, getStatusIcon, getStatusText,
 };
 export type { LogEvent, ExecStatus };
 

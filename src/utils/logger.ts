@@ -3,10 +3,11 @@ import {
 } from '../constants';
 import {
     IAction, ILogable, IQuestion, ITask, IActor, ExecStatus, LogEvent, ActivityType,
+    CallStackInfo,
 } from '../interfaces';
 import { Question } from '../screenplay/Question';
 import { Task } from '../screenplay/Task';
-import { printCallStack, getFilePath } from './call-stack';
+import { getLocation } from './call-stack';
 import testlaScreenplayEventEmitter from './event-emitter';
 
 /**
@@ -51,25 +52,29 @@ const identifyActivityType = (element: (IQuestion<any> | IAction | ITask) & ILog
 
 /**
  * Writes the log information directly to stdout
- * @param actor THe actor who triggered an executable
+ * @param actor The actor who triggered an executable
  * @param element The executable
  */
-const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable, status: ExecStatus): void => {
+const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogable, status: ExecStatus, time?: Date): void => {
     const activityType = identifyActivityType(element);
+    const activityDetails = [{
+        methodName: element.constructor.name,
+    }];
+    const toAdd = element.getCallStack?.()?.map((callstack: CallStackInfo) => ({
+        methodName: callstack.caller,
+        parameters: callstack.calledWith,
+    }));
+    activityDetails.push(...(toAdd || []));
     const evt: LogEvent = {
         activityType,
         activityAction: activityType === ACTIVITY_TYPE.QUESTION ? 'asks' : 'attemptsTo',
-        activityDetails: `${
-            element.constructor.name
-        }${
-            printCallStack(element.getCallStack?.())
-        }`,
+        activityDetails,
         status,
         actor: actor.attributes.name,
-        filePath: getFilePath(element.getCallStack?.()),
+        location: getLocation(element.getCallStack?.()),
         skipOnFailLevel,
         wrapLevel: indentationLevel,
-        time: new Date(),
+        time: time || new Date(),
     };
     testlaScreenplayEventEmitter.emit('logEvent', evt);
 };

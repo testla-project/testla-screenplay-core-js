@@ -108,13 +108,24 @@ export type ExecStatus = EXEC_STATUS;
 
 export type ActivityType = ACTIVITY_TYPE;
 
+export type ActivityDetail = {
+    methodName: string;
+    parameters?: { [key: string]: any };
+};
+
+export type Location = {
+    file: string;
+    line: number;
+    column: number;
+};
+
 export type LogEvent = {
     activityType: ActivityType;
     activityAction: string;
-    activityDetails: string;
+    activityDetails: ActivityDetail[];
     status: ExecStatus;
     actor: string;
-    filePath: string;
+    location?: Location;
     skipOnFailLevel: number;
     wrapLevel: number;
     time: Date;

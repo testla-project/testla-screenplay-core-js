@@ -10,14 +10,21 @@ export const BASH_COLOR = {
     RESET: '\x1B[0m',
 };
 
+export const LOGGING_STATUS_TEXT_ICON = {
+    PASS: '✓',
+    EXEC: '↪',
+    FAIL: '✗',
+    SKIP: '⤿',
+};
+
 // base indentation to match the pw:api indentation
 export const LOGGING_BASE_INDENTATION = '  ';
 
 export const LOGGING_BLANKS_PER_INDENTATION_LEVEL = 4;
 
 export enum EXEC_STATUS {
-    'START' = 'start',
-    'SUCCESS' = 'success',
+    'STARTED' = 'started',
+    'PASSED' = 'passed',
     'FAILED' = 'failed',
     'SKIPPED' = 'skipped'
 }

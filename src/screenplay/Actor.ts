@@ -85,11 +85,13 @@ export class Actor implements IActor {
     public async attemptsTo(...activities: (ITask | IAction)[]): Promise<any> {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, activity: (ITask | IAction) & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
+            const startTime = new Date();
+
             try {
                 if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelUp();
                 }
-                log(this, activity, EXEC_STATUS.START);
+                log(this, activity, EXEC_STATUS.STARTED, startTime);
                 if (activity instanceof Task) {
                     indentationLevelUp();
                 }
@@ -108,23 +110,26 @@ export class Actor implements IActor {
                     }
                 }
 
+                const endTime = new Date();
+
                 if (activity instanceof Task) {
                     indentationLevelDown();
                 }
 
                 if (skipped) {
-                    log(this, activity, EXEC_STATUS.FAILED);
+                    log(this, activity, EXEC_STATUS.FAILED, endTime);
                 }
-                log(this, activity, skipped ? EXEC_STATUS.SKIPPED : EXEC_STATUS.SUCCESS);
+                log(this, activity, skipped ? EXEC_STATUS.SKIPPED : EXEC_STATUS.PASSED, endTime);
                 if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelDown();
                 }
                 return Promise.resolve(innerRes);
             } catch (err) {
+                const endTime = new Date();
                 if (activity instanceof Task) {
                     indentationLevelDown();
                 }
-                log(this, activity, EXEC_STATUS.FAILED);
+                log(this, activity, EXEC_STATUS.FAILED, endTime);
                 if (activity.getCanSkipOnFail()) {
                     skipOnFailLevelDown();
                 }
@@ -156,18 +161,21 @@ export class Actor implements IActor {
     public async asks<T>(...questions: (IQuestion<T> & ILogable)[]): Promise<T> {
         // execute each activity in order.
         const reducefn = async (chain: Promise<any>, question: IQuestion<T> & ILogable): Promise<any> => chain.then(async (): Promise<any> => {
+            const startTime = new Date();
             try {
-                log(this, question, EXEC_STATUS.START);
+                log(this, question, EXEC_STATUS.STARTED, startTime);
                 const innerRes = await question.answeredBy(this);
-                log(this, question, EXEC_STATUS.SUCCESS);
+                const endTime = new Date();
+                log(this, question, EXEC_STATUS.PASSED, endTime);
                 return Promise.resolve(innerRes);
             } catch (err) {
+                const endTime = new Date();
                 if (question.getIsFailAsFalse()) {
-                    log(this, question, EXEC_STATUS.SUCCESS);
+                    log(this, question, EXEC_STATUS.PASSED, endTime);
                     return Promise.resolve(false);
                 }
 
-                log(this, question, EXEC_STATUS.FAILED);
+                log(this, question, EXEC_STATUS.FAILED, endTime);
                 throw (err);
             }
         });
