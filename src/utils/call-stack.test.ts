@@ -64,7 +64,7 @@ const STACKTRACE_LINES_BEFORE_NODE_24_QUESTION = [
     '    at new UsingLogging (/Users/bru0008k/code/testla-screenplay-core-js/src/templates/UsingLogging.ts:18:41)',
     '    at new Question (/Users/bru0008k/code/testla-screenplay-core-js/src/screenplay/Question.ts:10:9)',
     '    at new SampleQuestion (/Users/bru0008k/code/testla-screenplay-core-js/__tests__/implementations/SampleQuestion.ts:8:9)',
-    '    at SampleQuestion.get toHave [as toHave] (/Users/bru0008k/code/testla-screenplay-core-js/__tests__/implementations/SampleQuestion.ts:19:16)',
+    '    at Function.get toHave [as toHave] (/Users/bru0008k/code/testla-screenplay-core-js/__tests__/implementations/SampleQuestion.ts:19:16)',
     '    at /Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45',
     '    at Generator.next (<anonymous>)',
     '    at /Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:8:71',
@@ -93,7 +93,7 @@ const STACKTRACE_LINES_AFTER_NODE_24_QUESTION = [
     '    at new UsingLogging (/Users/bru0008k/code/testla-screenplay-core-js/src/templates/UsingLogging.ts:18:41)',
     '    at new Question (/Users/bru0008k/code/testla-screenplay-core-js/src/screenplay/Question.ts:10:9)',
     '    at new SampleQuestion (/Users/bru0008k/code/testla-screenplay-core-js/__tests__/implementations/SampleQuestion.ts:8:9)',
-    '    at Function.get toHave [as toHave] (/Users/bru0008k/code/testla-screenplay-core-js/__tests__/implementations/SampleQuestion.ts:19:16)',
+    '    at SampleQuestion.get toHave [as toHave] (/Users/bru0008k/code/testla-screenplay-core-js/__tests__/implementations/SampleQuestion.ts:19:16)',
     '    at /Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45',
     '    at Generator.next (<anonymous>)',
     '    at /Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:8:71',
@@ -147,10 +147,10 @@ describe('Call Stack Util', () => {
     });
 
     test('identifyCallerByStack before node 24 (question)', async () => {
-        expect(identifyCallerByStack(STACKTRACE_BEFORE_NODE_24_QUESTION)).toEqual({ caller: 'getAbilityPayload', file: '/Users/bru0008k/code/testla-screenplay-core-js/src/utils/call-stack.test.ts:18:27' });
+        expect(identifyCallerByStack(STACKTRACE_BEFORE_NODE_24_QUESTION)).toEqual({ caller: 'toHave', file: '/Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45' });
     });
 
     test('identifyCallerByStack after node 24 (question)', async () => {
-        expect(identifyCallerByStack(STACKTRACE_AFTER_NODE_24_QUESTION)).toEqual({ caller: 'getAbilityPayload', file: '/Users/bru0008k/code/testla-screenplay-core-js/src/utils/call-stack.test.ts:18:27' });
+        expect(identifyCallerByStack(STACKTRACE_AFTER_NODE_24_QUESTION)).toEqual({ caller: 'toHave', file: '/Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45' });
     });
 });

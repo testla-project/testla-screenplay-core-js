@@ -21,19 +21,15 @@ export const identifyCallerLine = (lines?: string[]): number => {
         }
 
         // Check for new format as of node 24: "at ObjectName.methodName (filepath)"
-        // Extract object name from the line and verify it matches the file path
         const newFormatMatch = line.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.[A-Za-z_$][A-Za-z0-9_$]*\s*\((.+)\)/);
         if (newFormatMatch) {
-            const objectName = newFormatMatch[1];
-            const filePath = newFormatMatch[2];
+            return true;
+        }
 
-            // Extract filename without extension from the file path
-            const fileMatch = filePath.match(/\/([^\/]+)\.(?:ts|js|tsx|jsx):/);
-            if (fileMatch) {
-                const fileName = fileMatch[1];
-                // Verify that the object name matches the filename
-                return objectName === fileName;
-            }
+        // Check for new format questions: "at ObjectName.get methodName [as"
+        const newFormatQuestionMatch = line.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.get\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\[as/);
+        if (newFormatQuestionMatch) {
+            return true;
         }
 
         return false;
@@ -71,11 +67,18 @@ export const identifyCallerByStack = (stack: string | undefined): { caller: stri
         const callerMatch = callerLine.match(callerRegex);
         callerName = callerMatch ? callerMatch[1] : undefined;
     } else {
-        // Check for new format: "at ObjectName.methodName (filepath)"
+        // Check for new format regular methods: "at ObjectName.methodName (filepath)"
         const newFormatMatch = callerLine.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.+)\)/);
         if (newFormatMatch) {
             const methodName = newFormatMatch[2];
             callerName = methodName;
+        } else {
+            // Check for new format questions: "at ObjectName.get methodName [as"
+            const newFormatQuestionMatch = callerLine.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.get\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\[as/);
+            if (newFormatQuestionMatch) {
+                const questionName = newFormatQuestionMatch[2];
+                callerName = questionName;
+            }
         }
     }
 
