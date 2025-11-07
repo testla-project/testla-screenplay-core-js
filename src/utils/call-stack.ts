@@ -1,8 +1,78 @@
 import { CallStackInfo, Location } from '../interfaces';
 
+// Stack trace patterns
 const FILE_REGEX = /at (.+)/;
-const CALLER_REGEX_NON_QUESTION = /at Function.(.+) \(/;
-const CALLER_REGEX_QUESTION = /at Function.get (.+) \[as/;
+
+// Pattern definitions for different Node.js formats and call types
+const STACK_PATTERNS = {
+    OLD_FORMAT: {
+        PREFIX: 'at Function.',
+        NON_QUESTION: /at Function.(.+) \(/,
+        QUESTION: /at Function.get (.+) \[as/,
+    },
+    NEW_FORMAT: {
+        NON_QUESTION: /^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.+)\)/,
+        QUESTION: /^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.get\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\[as/,
+    },
+} as const;
+
+/**
+ * Determines if a stack trace line uses the old Node.js format
+ * @param line the stack trace line
+ * @returns true if it's an old format line
+ */
+const isOldFormatLine = (line: string): boolean => line.includes(STACK_PATTERNS.OLD_FORMAT.PREFIX);
+
+/**
+ * Checks if a line matches any of the caller patterns
+ * @param line the stack trace line
+ * @returns true if it matches a caller pattern
+ */
+const isCallerLine = (line: string): boolean => {
+    if (isOldFormatLine(line)) {
+        return true;
+    }
+
+    return STACK_PATTERNS.NEW_FORMAT.NON_QUESTION.test(line)
+        || STACK_PATTERNS.NEW_FORMAT.QUESTION.test(line);
+};
+
+/**
+ * Extracts caller name from any format stack trace line
+ * @param line the stack trace line
+ * @returns caller name or undefined
+ */
+const extractCallerName = (line: string): string | undefined => {
+    if (isOldFormatLine(line)) {
+        const isQuestion = line.includes('Function.get ');
+        const pattern = isQuestion ? STACK_PATTERNS.OLD_FORMAT.QUESTION : STACK_PATTERNS.OLD_FORMAT.NON_QUESTION;
+        const match = line.match(pattern);
+        return match ? match[1] : undefined;
+    }
+
+    // Try new format patterns
+    let match = line.match(STACK_PATTERNS.NEW_FORMAT.NON_QUESTION);
+    if (match) {
+        return match[2]; // method name
+    }
+
+    match = line.match(STACK_PATTERNS.NEW_FORMAT.QUESTION);
+    if (match) {
+        return match[2]; // question name
+    }
+
+    return undefined;
+};
+
+/**
+ * Extracts file information from a stack trace line
+ * @param line the stack trace line (typically the line after caller line)
+ * @returns file path or undefined
+ */
+const extractFileName = (line: string): string | undefined => {
+    const match = line.match(FILE_REGEX);
+    return match ? match[1] : undefined;
+};
 
 /**
  * Identifies the line number of the caller in the stack trace
@@ -14,26 +84,7 @@ export const identifyCallerLine = (lines?: string[]): number => {
         return -1;
     }
 
-    return lines.findIndex((line: string) => {
-        // Check for old format before node 24: "at Function."
-        if (line.includes('at Function.')) {
-            return true;
-        }
-
-        // Check for new format as of node 24: "at ObjectName.methodName (filepath)"
-        const newFormatMatch = line.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.[A-Za-z_$][A-Za-z0-9_$]*\s*\((.+)\)/);
-        if (newFormatMatch) {
-            return true;
-        }
-
-        // Check for new format questions: "at ObjectName.get methodName [as"
-        const newFormatQuestionMatch = line.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.get\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\[as/);
-        if (newFormatQuestionMatch) {
-            return true;
-        }
-
-        return false;
-    });
+    return lines.findIndex(isCallerLine);
 };
 
 /**
@@ -55,36 +106,9 @@ export const identifyCallerByStack = (stack: string | undefined): { caller: stri
     const callerLine = stackLines[callerLineNo].trim();
     const fileLine = stackLines[fileLineNo].trim();
 
-    let callerName: string | undefined;
-
-    // Check for old format first: "at Function."
-    if (callerLine.includes('at Function.')) {
-        const isQuestion = callerLine.includes('Function.get ');
-        const callerRegex = !isQuestion
-            ? CALLER_REGEX_NON_QUESTION
-            : CALLER_REGEX_QUESTION;
-
-        const callerMatch = callerLine.match(callerRegex);
-        callerName = callerMatch ? callerMatch[1] : undefined;
-    } else {
-        // Check for new format regular methods: "at ObjectName.methodName (filepath)"
-        const newFormatMatch = callerLine.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.+)\)/);
-        if (newFormatMatch) {
-            const methodName = newFormatMatch[2];
-            callerName = methodName;
-        } else {
-            // Check for new format questions: "at ObjectName.get methodName [as"
-            const newFormatQuestionMatch = callerLine.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.get\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\[as/);
-            if (newFormatQuestionMatch) {
-                const questionName = newFormatQuestionMatch[2];
-                callerName = questionName;
-            }
-        }
-    }
-
-    // Always get filename from the line after the caller line
-    const fileMatch = fileLine.match(FILE_REGEX);
-    const fileName = fileMatch ? fileMatch[1] : undefined;
+    // Extract caller name and file information
+    const callerName = extractCallerName(callerLine);
+    const fileName = extractFileName(fileLine);
 
     return {
         caller: callerName || 'unknown',
