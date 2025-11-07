@@ -121,36 +121,40 @@ const STACKTRACE_BEFORE_NODE_24_QUESTION = STACKTRACE_LINES_BEFORE_NODE_24_QUEST
 const STACKTRACE_AFTER_NODE_24 = STACKTRACE_LINES_AFTER_NODE_24.join('\n');
 const STACKTRACE_AFTER_NODE_24_QUESTION = STACKTRACE_LINES_AFTER_NODE_24_QUESTION.join('\n');
 
+const LINE_TO_BE_IDENTIFIED = 5;
+const CALLER_TO_BE_IDENTIFIED = { caller: 'getAbilityPayload', file: '/Users/bru0008k/code/testla-screenplay-core-js/src/utils/call-stack.test.ts:18:27' };
+const CALLER_TO_BE_IDENTIFIED_QUESTION = { caller: 'toHave', file: '/Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45' };
+
 describe('Call Stack Util', () => {
     test('identifyCallerLine before node 24', async () => {
-        expect(identifyCallerLine(STACKTRACE_LINES_BEFORE_NODE_24)).toBe(5);
+        expect(identifyCallerLine(STACKTRACE_LINES_BEFORE_NODE_24)).toBe(LINE_TO_BE_IDENTIFIED);
     });
 
     test('identifyCallerLine after node 24', async () => {
-        expect(identifyCallerLine(STACKTRACE_LINES_AFTER_NODE_24)).toBe(5);
+        expect(identifyCallerLine(STACKTRACE_LINES_AFTER_NODE_24)).toBe(LINE_TO_BE_IDENTIFIED);
     });
 
     test('identifyCallerLine before node 24 (question)', async () => {
-        expect(identifyCallerLine(STACKTRACE_LINES_BEFORE_NODE_24_QUESTION)).toBe(5);
+        expect(identifyCallerLine(STACKTRACE_LINES_BEFORE_NODE_24_QUESTION)).toBe(LINE_TO_BE_IDENTIFIED);
     });
 
     test('identifyCallerLine after node 24 (question)', async () => {
-        expect(identifyCallerLine(STACKTRACE_LINES_AFTER_NODE_24_QUESTION)).toBe(5);
+        expect(identifyCallerLine(STACKTRACE_LINES_AFTER_NODE_24_QUESTION)).toBe(LINE_TO_BE_IDENTIFIED);
     });
 
     test('identifyCallerByStack before node 24', async () => {
-        expect(identifyCallerByStack(STACKTRACE_BEFORE_NODE_24)).toEqual({ caller: 'getAbilityPayload', file: '/Users/bru0008k/code/testla-screenplay-core-js/src/utils/call-stack.test.ts:18:27' });
+        expect(identifyCallerByStack(STACKTRACE_BEFORE_NODE_24)).toEqual(CALLER_TO_BE_IDENTIFIED);
     });
 
     test('identifyCallerByStack after node 24', async () => {
-        expect(identifyCallerByStack(STACKTRACE_AFTER_NODE_24)).toEqual({ caller: 'getAbilityPayload', file: '/Users/bru0008k/code/testla-screenplay-core-js/src/utils/call-stack.test.ts:18:27' });
+        expect(identifyCallerByStack(STACKTRACE_AFTER_NODE_24)).toEqual(CALLER_TO_BE_IDENTIFIED);
     });
 
     test('identifyCallerByStack before node 24 (question)', async () => {
-        expect(identifyCallerByStack(STACKTRACE_BEFORE_NODE_24_QUESTION)).toEqual({ caller: 'toHave', file: '/Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45' });
+        expect(identifyCallerByStack(STACKTRACE_BEFORE_NODE_24_QUESTION)).toEqual(CALLER_TO_BE_IDENTIFIED_QUESTION);
     });
 
     test('identifyCallerByStack after node 24 (question)', async () => {
-        expect(identifyCallerByStack(STACKTRACE_AFTER_NODE_24_QUESTION)).toEqual({ caller: 'toHave', file: '/Users/bru0008k/code/testla-screenplay-core-js/__tests__/logging.spec.ts:27:45' });
+        expect(identifyCallerByStack(STACKTRACE_AFTER_NODE_24_QUESTION)).toEqual(CALLER_TO_BE_IDENTIFIED_QUESTION);
     });
 });
