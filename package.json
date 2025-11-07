@@ -9,6 +9,7 @@
     "build": "rm -r lib || true && tsc",
     "test": "jest --watch",
     "test:nowatch": "jest",
+    "test:report": "jest --json --outputFile=report.json",
     "lint:ts": "tsc --noEmit",
     "lint:js": "eslint . --cache",
     "lint": "npm run lint:js && npm run lint:ts",
