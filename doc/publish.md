@@ -18,4 +18,10 @@ Builds the package
 npm publish
 ```
 
+In case of beta release
+
+```
+npm publish --tag beta
+```
+
 Ensures all quality measures like linting and tests and then publishes to npm
