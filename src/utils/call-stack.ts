@@ -9,11 +9,84 @@ const CALLER_REGEX_QUESTION = /at Function.get (.+) \[as/;
  * @param lines the stack lines
  * @returns the line number of the caller or -1 if not found
  */
-const identifyCallerLine = (lines?: string[]): number => {
-    if (lines) {
-        return lines.findIndex((line: string) => line.includes('at Function.'));
+export const identifyCallerLine = (lines?: string[]): number => {
+    if (!lines) {
+        return -1;
     }
-    return -1;
+
+    return lines.findIndex((line: string) => {
+        // Check for old format before node 24: "at Function."
+        if (line.includes('at Function.')) {
+            return true;
+        }
+
+        // Check for new format as of node 24: "at ObjectName.methodName (filepath)"
+        // Extract object name from the line and verify it matches the file path
+        const newFormatMatch = line.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.[A-Za-z_$][A-Za-z0-9_$]*\s*\((.+)\)/);
+        if (newFormatMatch) {
+            const objectName = newFormatMatch[1];
+            const filePath = newFormatMatch[2];
+
+            // Extract filename without extension from the file path
+            const fileMatch = filePath.match(/\/([^\/]+)\.(?:ts|js|tsx|jsx):/);
+            if (fileMatch) {
+                const fileName = fileMatch[1];
+                // Verify that the object name matches the filename
+                return objectName === fileName;
+            }
+        }
+
+        return false;
+    });
+};
+
+/**
+ * Identifies the current caller information by stack string
+ * @param stack the stack string
+ * @returns caller and file
+ */
+export const identifyCallerByStack = (stack: string | undefined): { caller: string; file?: string; } => {
+    const stackLines = stack?.split('\n') || [''];
+    const callerLineNo = identifyCallerLine(stackLines);
+
+    if (callerLineNo === -1) {
+        return {
+            caller: 'unknown',
+        };
+    }
+
+    const fileLineNo = callerLineNo + 1;
+    const callerLine = stackLines[callerLineNo].trim();
+    const fileLine = stackLines[fileLineNo].trim();
+
+    let callerName: string | undefined;
+
+    // Check for old format first: "at Function."
+    if (callerLine.includes('at Function.')) {
+        const isQuestion = callerLine.includes('Function.get ');
+        const callerRegex = !isQuestion
+            ? CALLER_REGEX_NON_QUESTION
+            : CALLER_REGEX_QUESTION;
+
+        const callerMatch = callerLine.match(callerRegex);
+        callerName = callerMatch ? callerMatch[1] : undefined;
+    } else {
+        // Check for new format: "at ObjectName.methodName (filepath)"
+        const newFormatMatch = callerLine.match(/^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.+)\)/);
+        if (newFormatMatch) {
+            const methodName = newFormatMatch[2];
+            callerName = methodName;
+        }
+    }
+
+    // Always get filename from the line after the caller line
+    const fileMatch = fileLine.match(FILE_REGEX);
+    const fileName = fileMatch ? fileMatch[1] : undefined;
+
+    return {
+        caller: callerName || 'unknown',
+        file: fileName,
+    };
 };
 
 /**
@@ -22,25 +95,7 @@ const identifyCallerLine = (lines?: string[]): number => {
  */
 export const identifyCaller = (): { caller: string; file?: string; } => {
     const { stack } = new Error();
-    const stackLines = stack?.split('\n') || [''];
-    const callerLineNo = identifyCallerLine(stackLines);
-    const fileLineNo = callerLineNo + 1;
-    const callerLine = stackLines[callerLineNo].trim();
-    const fileLine = stackLines[fileLineNo].trim();
-    const isQuestion = (callerLine || '').includes('Function.get ');
-
-    const callerRegex = !isQuestion
-        ? CALLER_REGEX_NON_QUESTION
-        : CALLER_REGEX_QUESTION;
-
-    // eslint-disable-next-line
-    const callerName = callerLine?.match(callerRegex);
-    const fileName = fileLine?.match(FILE_REGEX);
-
-    return {
-        caller: callerName ? callerName[1] : 'unknown',
-        file: fileName ? fileName[1] : undefined,
-    };
+    return identifyCallerByStack(stack);
 };
 
 /**
