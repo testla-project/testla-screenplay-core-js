@@ -1,6 +1,6 @@
 {
   "name": "@testla/screenplay",
-  "version": "1.2.1-beta.1",
+  "version": "1.2.1",
   "description": "Framework for an implementation of the Screenplay pattern.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
