@@ -1,19 +1,119 @@
 import { CallStackInfo, Location } from '../interfaces';
 
+// Stack trace patterns
 const FILE_REGEX = /at (.+)/;
-const CALLER_REGEX_NON_QUESTION = /at Function.(.+) \(/;
-const CALLER_REGEX_QUESTION = /at Function.get (.+) \[as/;
+
+// Pattern definitions for different Node.js formats and call types
+const STACK_PATTERNS = {
+    OLD_FORMAT: {
+        PREFIX: 'at Function.',
+        NON_QUESTION: /at Function.(.+) \(/,
+        QUESTION: /at Function.get (.+) \[as/,
+    },
+    NEW_FORMAT: {
+        NON_QUESTION: /^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.+)\)/,
+        QUESTION: /^\s*at\s+([A-Za-z_$][A-Za-z0-9_$]*)\.get\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\[as/,
+    },
+} as const;
+
+/**
+ * Determines if a stack trace line uses the old Node.js format
+ * @param line the stack trace line
+ * @returns true if it's an old format line
+ */
+const isOldFormatLine = (line: string): boolean => line.includes(STACK_PATTERNS.OLD_FORMAT.PREFIX);
+
+/**
+ * Checks if a line matches any of the caller patterns
+ * @param line the stack trace line
+ * @returns true if it matches a caller pattern
+ */
+const isCallerLine = (line: string): boolean => {
+    if (isOldFormatLine(line)) {
+        return true;
+    }
+
+    return STACK_PATTERNS.NEW_FORMAT.NON_QUESTION.test(line)
+        || STACK_PATTERNS.NEW_FORMAT.QUESTION.test(line);
+};
+
+/**
+ * Extracts caller name from any format stack trace line
+ * @param line the stack trace line
+ * @returns caller name or undefined
+ */
+const extractCallerName = (line: string): string | undefined => {
+    if (isOldFormatLine(line)) {
+        const isQuestion = line.includes('Function.get ');
+        const pattern = isQuestion ? STACK_PATTERNS.OLD_FORMAT.QUESTION : STACK_PATTERNS.OLD_FORMAT.NON_QUESTION;
+        const match = line.match(pattern);
+        return match ? match[1] : undefined;
+    }
+
+    // Try new format patterns
+    let match = line.match(STACK_PATTERNS.NEW_FORMAT.NON_QUESTION);
+    if (match) {
+        return match[2]; // method name
+    }
+
+    match = line.match(STACK_PATTERNS.NEW_FORMAT.QUESTION);
+    if (match) {
+        return match[2]; // question name
+    }
+
+    return undefined;
+};
+
+/**
+ * Extracts file information from a stack trace line
+ * @param line the stack trace line (typically the line after caller line)
+ * @returns file path or undefined
+ */
+const extractFileName = (line: string): string | undefined => {
+    const match = line.match(FILE_REGEX);
+    return match ? match[1] : undefined;
+};
 
 /**
  * Identifies the line number of the caller in the stack trace
  * @param lines the stack lines
  * @returns the line number of the caller or -1 if not found
  */
-const identifyCallerLine = (lines?: string[]): number => {
-    if (lines) {
-        return lines.findIndex((line: string) => line.includes('at Function.'));
+export const identifyCallerLine = (lines?: string[]): number => {
+    if (!lines) {
+        return -1;
     }
-    return -1;
+
+    return lines.findIndex(isCallerLine);
+};
+
+/**
+ * Identifies the current caller information by stack string
+ * @param stack the stack string
+ * @returns caller and file
+ */
+export const identifyCallerByStack = (stack: string | undefined): { caller: string; file?: string; } => {
+    const stackLines = stack?.split('\n') || [''];
+    const callerLineNo = identifyCallerLine(stackLines);
+
+    if (callerLineNo === -1) {
+        return {
+            caller: 'unknown',
+        };
+    }
+
+    const fileLineNo = callerLineNo + 1;
+    const callerLine = stackLines[callerLineNo].trim();
+    const fileLine = stackLines[fileLineNo].trim();
+
+    // Extract caller name and file information
+    const callerName = extractCallerName(callerLine);
+    const fileName = extractFileName(fileLine);
+
+    return {
+        caller: callerName || 'unknown',
+        file: fileName,
+    };
 };
 
 /**
@@ -22,25 +122,7 @@ const identifyCallerLine = (lines?: string[]): number => {
  */
 export const identifyCaller = (): { caller: string; file?: string; } => {
     const { stack } = new Error();
-    const stackLines = stack?.split('\n') || [''];
-    const callerLineNo = identifyCallerLine(stackLines);
-    const fileLineNo = callerLineNo + 1;
-    const callerLine = stackLines[callerLineNo].trim();
-    const fileLine = stackLines[fileLineNo].trim();
-    const isQuestion = (callerLine || '').includes('Function.get ');
-
-    const callerRegex = !isQuestion
-        ? CALLER_REGEX_NON_QUESTION
-        : CALLER_REGEX_QUESTION;
-
-    // eslint-disable-next-line
-    const callerName = callerLine?.match(callerRegex);
-    const fileName = fileLine?.match(FILE_REGEX);
-
-    return {
-        caller: callerName ? callerName[1] : 'unknown',
-        file: fileName ? fileName[1] : undefined,
-    };
+    return identifyCallerByStack(stack);
 };
 
 /**

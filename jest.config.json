@@ -6,6 +6,6 @@
         "/node_modules/"
     ],
     "testMatch": [
-        "**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)"
+        "**/(__tests__|src)/**/?(*.)+(spec|test).[jt]s?(x)"
     ]
 }
