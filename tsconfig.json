@@ -23,6 +23,9 @@
     "src"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "__tests__/**/*"
   ]
 }
