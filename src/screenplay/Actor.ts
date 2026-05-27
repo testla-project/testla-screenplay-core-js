@@ -7,9 +7,9 @@ import log, {
 } from '../utils/logger';
 import { Task } from './Task';
 
-// Local utility to access protected failAsFalse for internal use only
-function getFailAsFalse(question: any): boolean {
-    return (question as { failAsFalse: boolean }).failAsFalse;
+// Local utility to access protected isFailAsFalse for internal use only
+function getIsFailAsFalse(question: any): boolean {
+    return (question as { isFailAsFalse: boolean }).isFailAsFalse;
 }
 
 // Local utility to access protected canSkipOnFail for internal use only
@@ -180,7 +180,7 @@ export class Actor implements IActor {
                 return Promise.resolve(innerRes);
             } catch (err) {
                 const endTime = new Date();
-                if (getFailAsFalse(question)) {
+                if (getIsFailAsFalse(question)) {
                     log(this, question, EXEC_STATUS.PASSED, endTime);
                     return Promise.resolve(false);
                 }
