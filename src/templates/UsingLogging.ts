@@ -2,8 +2,8 @@ import { LOGGING_IDENTIFIER, STRUCTURED_LOGS_ENVVAR_NAME } from '../constants';
 import { CallStackCalledWith, CallStackInfo } from '../interfaces';
 import { identifyCaller } from '../utils/call-stack';
 
-export class UsingLogging {
-    private callStack?: CallStackInfo[];
+export abstract class UsingLogging {
+    protected callStack?: CallStackInfo[];
 
     constructor() {
         if (
@@ -18,19 +18,15 @@ export class UsingLogging {
         this.callStack = [identifyCaller()];
     }
 
-    setCallStackInitializeCalledWith(calledWith: CallStackCalledWith) {
+    protected setCallStackInitializeCalledWith(calledWith: CallStackCalledWith): void {
         if (this.callStack) {
             this.callStack[0].calledWith = calledWith;
         }
     }
 
-    addToCallStack(entry: CallStackInfo) {
+    protected addToCallStack(entry: CallStackInfo): void {
         if (this.callStack) {
             this.callStack.push(entry);
         }
-    }
-
-    getCallStack() {
-        return this.callStack;
     }
 }

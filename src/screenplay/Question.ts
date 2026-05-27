@@ -16,7 +16,7 @@ export abstract class Question<T> extends UsingAlias implements IQuestion<T>, IL
     /**
      * If set to true the question returns fale in case of fail instead of throwing an exception
      */
-    private isFailAsFalse = false;
+    protected isFailAsFalse = false;
 
     /**
      * Makes failing questions returning false instead of throwing an exception.
@@ -26,13 +26,5 @@ export abstract class Question<T> extends UsingAlias implements IQuestion<T>, IL
         this.isFailAsFalse = true;
         this.addToCallStack({ caller: 'failAsFalse' });
         return this;
-    }
-
-    /**
-     * Returns the failAsFalse state
-     * @returns if failAsFalse is set
-     */
-    public getIsFailAsFalse() {
-        return this.isFailAsFalse;
     }
 }
