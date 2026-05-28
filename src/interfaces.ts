@@ -28,13 +28,12 @@ export type CallStackInfo = {
     caller: string;
     // an object holding key/value pairs for all input attributes
     calledWith?: CallStackCalledWith;
-    // the file where the caller is lovcated
+    // the file where the caller is located
     file?: string;
 };
 
-export interface ILogable {
-    getCallStack?(): CallStackInfo[] | undefined;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ILogable {}
 
 export interface IAbility {
     // this is an empty interface, since every ability has its own
@@ -59,12 +58,6 @@ export interface IAction {
      * @see {@link IActor}
      */
     performAs(actor: IActor): Promise<any>;
-
-    /**
-     * Returns the failAsFalse state
-     * @returns if failAsFalse is set
-     */
-    getCanSkipOnFail(): boolean;
 }
 
 /**
@@ -81,12 +74,6 @@ export interface ITask {
      * @see {@link IActor}
      */
     performAs(actor: IActor): Promise<any>;
-
-    /**
-     * Returns the failAsFalse state
-     * @returns if failAsFalse is set
-     */
-    getCanSkipOnFail(): boolean;
 }
 
 export interface IQuestion<T> {
@@ -96,12 +83,6 @@ export interface IQuestion<T> {
      * @param {IActor} actor the actor that queries.
      */
     answeredBy(actor: IActor): Promise<T>;
-
-    /**
-     * Returns the failAsFalse state
-     * @returns if failAsFalse is set
-     */
-    getIsFailAsFalse(): boolean;
 }
 
 export type ExecStatus = EXEC_STATUS;

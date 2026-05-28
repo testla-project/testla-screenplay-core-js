@@ -33,12 +33,4 @@ export abstract class Action extends UsingAlias implements IAction, ILogable {
         this.addToCallStack({ caller: 'orSkipOnFail' });
         return this;
     }
-
-    /**
-     * Returns the orSkipOnFail state
-     * @returns if orSkipOnFail is set
-     */
-    public getCanSkipOnFail() {
-        return this.canSkipOnFail;
-    }
 }

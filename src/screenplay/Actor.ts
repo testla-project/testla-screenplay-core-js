@@ -7,6 +7,16 @@ import log, {
 } from '../utils/logger';
 import { Task } from './Task';
 
+// Local utility to access protected isFailAsFalse for internal use only
+function getIsFailAsFalse(question: any): boolean {
+    return (question as { isFailAsFalse: boolean }).isFailAsFalse;
+}
+
+// Local utility to access protected canSkipOnFail for internal use only
+function getCanSkipOnFail(activity: any): boolean {
+    return (activity as { canSkipOnFail: boolean }).canSkipOnFail;
+}
+
 /**
  * Actors use abilities in order to execute tasks/actions and answer questions.
  */
@@ -88,7 +98,7 @@ export class Actor implements IActor {
             const startTime = new Date();
 
             try {
-                if (activity.getCanSkipOnFail()) {
+                if (getCanSkipOnFail(activity)) {
                     skipOnFailLevelUp();
                 }
                 log(this, activity, EXEC_STATUS.STARTED, startTime);
@@ -103,7 +113,7 @@ export class Actor implements IActor {
                     innerRes = await activity.performAs(this);
                 } catch (e) {
                     // eslint-disable-next-line
-                    if (activity.getCanSkipOnFail()) {
+                    if (getCanSkipOnFail(activity)) {
                         skipped = true;
                     } else {
                         throw e;
@@ -120,7 +130,7 @@ export class Actor implements IActor {
                     log(this, activity, EXEC_STATUS.FAILED, endTime);
                 }
                 log(this, activity, skipped ? EXEC_STATUS.SKIPPED : EXEC_STATUS.PASSED, endTime);
-                if (activity.getCanSkipOnFail()) {
+                if (getCanSkipOnFail(activity)) {
                     skipOnFailLevelDown();
                 }
                 return Promise.resolve(innerRes);
@@ -130,7 +140,7 @@ export class Actor implements IActor {
                     indentationLevelDown();
                 }
                 log(this, activity, EXEC_STATUS.FAILED, endTime);
-                if (activity.getCanSkipOnFail()) {
+                if (getCanSkipOnFail(activity)) {
                     skipOnFailLevelDown();
                 }
                 throw (err);
@@ -170,7 +180,7 @@ export class Actor implements IActor {
                 return Promise.resolve(innerRes);
             } catch (err) {
                 const endTime = new Date();
-                if (question.getIsFailAsFalse()) {
+                if (getIsFailAsFalse(question)) {
                     log(this, question, EXEC_STATUS.PASSED, endTime);
                     return Promise.resolve(false);
                 }

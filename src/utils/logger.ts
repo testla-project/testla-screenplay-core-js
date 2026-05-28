@@ -10,6 +10,11 @@ import { Task } from '../screenplay/Task';
 import { getLocation } from './call-stack';
 import testlaScreenplayEventEmitter from './event-emitter';
 
+// Local utility to access protected callStack for internal use only
+function getCallStack(element: any): CallStackInfo[] | undefined {
+    return (element as { callStack: CallStackInfo[] }).callStack;
+}
+
 /**
  * Current skipOnFail level
  */
@@ -60,7 +65,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
     const activityDetails = [{
         methodName: element.constructor.name,
     }];
-    const toAdd = element.getCallStack?.()?.map((callstack: CallStackInfo) => ({
+    const toAdd = getCallStack(element)?.map((callstack: CallStackInfo) => ({
         methodName: callstack.caller,
         parameters: callstack.calledWith,
     }));
@@ -71,7 +76,7 @@ const log = (actor: IActor, element: (IQuestion<any> | IAction | ITask) & ILogab
         activityDetails,
         status,
         actor: actor.attributes.name,
-        location: getLocation(element.getCallStack?.()),
+        location: getLocation(getCallStack(element)),
         skipOnFailLevel,
         wrapLevel: indentationLevel,
         time: time || new Date(),
